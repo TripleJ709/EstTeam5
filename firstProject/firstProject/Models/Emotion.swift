@@ -37,17 +37,15 @@ enum Emotion: String, CaseIterable, Identifiable {
         }
     }
 
-    var colorName: String {
+    var color: Color {
         switch self {
-        case .joy: return "EmotionJoy"
-        case .achievement: return "EmotionAchievement"
-        case .stable: return "EmotionStable"
-        case .angry: return "EmotionAngry"
-        case .fear: return "EmotionFear"
-        case .sad: return "EmotionSad"
-        case .exhausted: return "EmotionExhausted"
+        case .joy: return .yellow
+        case .achievement: return .orange
+        case .stable: return .green
+        case .angry: return .red
+        case .fear: return .purple
+        case .sad: return .blue
+        case .exhausted: return .gray
         }
     }
-
-    var color: Color { Color(colorName) }
 }
