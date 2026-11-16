@@ -1,17 +1,12 @@
-//
-//  firstProjectApp.swift
-//  firstProject
-//
-//  Created by 장주진 on 11/16/26.
-//
-
+import SwiftData
 import SwiftUI
 
 @main
 struct firstProjectApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
+        .modelContainer(for: [Retrospective.self, Category.self])
     }
 }
