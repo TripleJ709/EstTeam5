@@ -15,5 +15,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .modelContainer(for: [Retrospective.self, Category.self], inMemory: true)
+        .modelContainer(for: Retrospective.self, inMemory: true)
 }
