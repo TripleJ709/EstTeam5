@@ -38,3 +38,27 @@ struct EmotionAuraView: View {
     .padding()
     .background(FeeloColor.bgApp)
 }
+
+/// 선택한 감정 색이 화면 위쪽으로 번지는 배경
+struct EmotionWash: View {
+    let emotion: Emotion
+    var opacity: Double = 0.75
+    var blur: CGFloat = 20
+
+    var body: some View {
+        Circle()
+            .fill(
+                RadialGradient(
+                    colors: [emotion.auraStart, emotion.auraEnd.opacity(0)],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 210
+                )
+            )
+            .frame(width: 420, height: 420)
+            .opacity(opacity)
+            .blur(radius: blur)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}

@@ -9,12 +9,13 @@ enum FeeloColor {
     static let textSecondary = Color(hex: 0x6B6880)
     /// 브랜드 Ink. 버튼·선택 강조(tint/primary)
     static let tint = Color(hex: 0x232946)
-    /// Figma에서 값을 확인하지 못해 textSecondary를 옅게 쓴 임시 값
-    static let borderDashed = Color(hex: 0x6B6880).opacity(0.4)
+    static let borderDashed = Color(hex: 0xC9C3D9)
+    static let destructive = Color(hex: 0xFF383C)
 }
 
 enum FeeloRadius {
     static let cell: CGFloat = 14
+    static let control: CGFloat = 20
     static let card: CGFloat = 26
 }
 
