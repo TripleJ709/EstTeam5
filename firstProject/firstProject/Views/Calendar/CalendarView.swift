@@ -6,29 +6,40 @@ struct CalendarView: View {
     let month: Date
     let retrospectives: [Retrospective]
     @Binding var selectedDate: Date
+    var today: Date = AppClock.now
+    /// 이 날짜 이전에는 "기록 안 한 날" 점선을 그리지 않는다.
+    var installDate: Date = AppClock.installDate
 
-    private var calendar: Calendar { .current }
+    /// 요일 기호를 한글(일 월 화…)로 보여주기 위해 로케일을 고정한다.
+    private var calendar: Calendar {
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: "ko_KR")
+        return calendar
+    }
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 8) {
             weekdayHeader
-            LazyVGrid(columns: columns, spacing: 4) {
+            LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(days, id: \.self) { date in
                     DayCell(
                         date: date,
                         day: calendar.component(.day, from: date),
-                        state: state(for: date),
-                        emotion: emotion(on: date)
+                        isOutside: !calendar.isDate(date, equalTo: month, toGranularity: .month),
+                        isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
+                        isToday: calendar.isDate(date, inSameDayAs: today),
+                        marker: marker(for: date)
                     ) {
                         selectedDate = date
                     }
                 }
             }
         }
-        .padding(.vertical, 12)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+        .padding(.horizontal, 11)
+        .padding(.vertical, 10)
+        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.calendar))
     }
 
     private var weekdayHeader: some View {
@@ -38,7 +49,8 @@ struct CalendarView: View {
         return LazyVGrid(columns: columns, spacing: 0) {
             ForEach(ordered.indices, id: \.self) { index in
                 Text(ordered[index])
-                    .font(.caption)
+                    .font(.system(size: 13, weight: .medium))
+                    .tracking(-0.08)
                     .foregroundStyle(FeeloColor.textSecondary)
                     .frame(height: 20)
             }
@@ -74,67 +86,80 @@ struct CalendarView: View {
             .emotion
     }
 
-    private func state(for date: Date) -> DayCell.State {
-        guard calendar.isDate(date, equalTo: month, toGranularity: .month) else { return .outside }
-        if calendar.isDate(date, inSameDayAs: selectedDate) { return .selected }
-        if emotion(on: date) != nil { return .recorded }
-        if date < calendar.startOfDay(for: .now) { return .missed }
-        return .empty
+    /// 기록이 있으면 감정 구슬, 사용 시작일 이후의 지난 날에 기록이 없으면 점선, 그 외는 비워 둔다.
+    private func marker(for date: Date) -> DayCell.Marker {
+        guard calendar.isDate(date, equalTo: month, toGranularity: .month) else { return .none }
+        if let emotion = emotion(on: date) { return .emotion(emotion) }
+        let day = calendar.startOfDay(for: date)
+        if day < calendar.startOfDay(for: today), day >= calendar.startOfDay(for: installDate) {
+            return .missed
+        }
+        return .none
     }
 }
 
 // MARK: - Day cell
 
 private struct DayCell: View {
-    enum State { case empty, recorded, missed, selected, outside }
+    enum Marker: Equatable { case none, missed, emotion(Emotion) }
 
     let date: Date
     let day: Int
-    let state: State
-    let emotion: Emotion?
+    let isOutside: Bool
+    let isSelected: Bool
+    let isToday: Bool
+    let marker: Marker
     let action: () -> Void
+
+    /// 선택한 날과 오늘은 굵은 Ink 숫자로 보여준다.
+    private var isEmphasized: Bool { isSelected || isToday }
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Text("\(day)")
-                    .font(state == .selected ? .body.weight(.medium) : .callout)
-                    .foregroundStyle(FeeloColor.textPrimary)
-                    .opacity(state == .outside ? 0.35 : 1)
-                marker
+                    .font(.system(size: isEmphasized ? 17 : 16, weight: isEmphasized ? .medium : .regular))
+                    .tracking(isEmphasized ? -0.43 : -0.31)
+                    .foregroundStyle(isEmphasized ? FeeloColor.tint : FeeloColor.textPrimary)
+                    .opacity(isOutside ? 0.35 : 1)
+                markerView
             }
+            .padding(.bottom, 6)
             .frame(maxWidth: .infinity)
-            .frame(height: 64)
+            .frame(height: 72)
             .background(
-                state == .selected ? FeeloColor.bgSelected : .clear,
+                isSelected && !isOutside ? FeeloColor.bgSelected : .clear,
                 in: RoundedRectangle(cornerRadius: FeeloRadius.cell)
             )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(state == .outside)
+        .disabled(isOutside)
         .accessibilityLabel(accessibilityText)
     }
 
     @ViewBuilder
-    private var marker: some View {
-        if let emotion, state == .recorded || state == .selected {
-            EmotionAuraView(emotion: emotion, size: 28)
-        } else if state == .missed {
+    private var markerView: some View {
+        switch marker {
+        case .emotion(let emotion):
+            EmotionAuraView(emotion: emotion, size: 34)
+        case .missed:
             Circle()
                 .strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                .frame(width: 28, height: 28)
-        } else {
-            Color.clear.frame(width: 28, height: 28)
+                .frame(width: 34, height: 34)
+        case .none:
+            Color.clear.frame(width: 34, height: 34)
         }
     }
 
     private var accessibilityText: String {
-        let dateText = date.formatted(.dateTime.month().day().locale(Locale(identifier: "ko_KR")))
-        if let emotion, state == .recorded || state == .selected {
-            return "\(dateText), \(emotion.displayName)"
+        let dateText = (isToday ? "오늘, " : "")
+            + date.formatted(.dateTime.month().day().locale(Locale(identifier: "ko_KR")))
+        switch marker {
+        case .emotion(let emotion): return "\(dateText), \(emotion.displayName)"
+        case .missed: return "\(dateText), 기록 없음"
+        case .none: return dateText
         }
-        return state == .missed ? "\(dateText), 기록 없음" : dateText
     }
 }
 

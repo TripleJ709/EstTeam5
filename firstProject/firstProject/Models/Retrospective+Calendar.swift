@@ -37,7 +37,7 @@ extension Retrospective {
         calendar: Calendar = .current
     ) -> String {
         let monthItems = inMonth(items, of: month, calendar: calendar)
-        guard let top = topEmotion(in: monthItems) else { return "이번 달은 아직 기록이 없어요" }
+        guard let top = topEmotion(in: monthItems) else { return "첫 회고를 남기면 달력에 색이 채워져요" }
         return "이번 달은 \(top.displayName)\(top.subjectParticle) 가장 많았어요 · \(monthItems.count)개의 기록"
     }
 }

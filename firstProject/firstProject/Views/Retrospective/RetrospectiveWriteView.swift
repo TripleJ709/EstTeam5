@@ -14,9 +14,9 @@ struct RetrospectiveWriteView: View {
     private let recommender = EmotionRecommender()
     private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
 
-    init(retrospective: Retrospective? = nil) {
+    init(retrospective: Retrospective? = nil, date: Date? = nil) {
         self.retrospective = retrospective
-        _draft = State(initialValue: retrospective.map(RetrospectiveDraft.init) ?? RetrospectiveDraft())
+        _draft = State(initialValue: retrospective.map(RetrospectiveDraft.init) ?? RetrospectiveDraft(date: date ?? .now))
     }
 
     var body: some View {

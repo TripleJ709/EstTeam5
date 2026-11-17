@@ -17,6 +17,8 @@ enum FeeloRadius {
     static let cell: CGFloat = 14
     static let control: CGFloat = 20
     static let card: CGFloat = 26
+    /// 월간 달력 카드
+    static let calendar: CGFloat = 28
 }
 
 extension Color {
