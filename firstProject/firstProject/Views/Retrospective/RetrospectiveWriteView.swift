@@ -1,44 +1,31 @@
 import SwiftData
 import SwiftUI
 
-/// 회고 작성·편집 시트 (Figma "제안 C · 회고 작성")
-/// `retrospective`가 있으면 편집, 없으면 새 회고를 만든다.
 struct RetrospectiveWriteView: View {
-    static let maxLength = 500
-
     var retrospective: Retrospective?
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
-    @State private var date: Date
-    @State private var emotion: Emotion?
-    @State private var content: String
+    @State private var draft: RetrospectiveDraft
 
     private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
 
     init(retrospective: Retrospective? = nil) {
         self.retrospective = retrospective
-        _date = State(initialValue: retrospective?.date ?? .now)
-        _emotion = State(initialValue: retrospective?.emotion)
-        _content = State(initialValue: retrospective?.content ?? "")
-    }
-
-    private var canSave: Bool {
-        emotion != nil && !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        _draft = State(initialValue: retrospective.map(RetrospectiveDraft.init) ?? RetrospectiveDraft())
     }
 
     var body: some View {
         ZStack(alignment: .top) {
             FeeloColor.bgApp.ignoresSafeArea()
 
-            // 선택한 감정 색이 시트 위쪽에 은은하게 번진다.
-            if let emotion {
+            if let emotion = draft.emotion {
                 EmotionWash(emotion: emotion, opacity: 0.55, blur: 30)
                     .frame(maxWidth: .infinity)
                     .offset(y: -200)
                     .ignoresSafeArea()
-                    .animation(.easeInOut(duration: 0.25), value: emotion)
+                    .animation(.easeInOut(duration: 0.25), value: draft.emotion)
             }
 
             ScrollView {
@@ -70,7 +57,7 @@ struct RetrospectiveWriteView: View {
                     Image(systemName: "checkmark")
                         .accessibilityLabel("저장")
                 }
-                .disabled(!canSave)
+                .disabled(!draft.canSave)
             }
         }
         .tint(FeeloColor.tint)
@@ -82,7 +69,7 @@ struct RetrospectiveWriteView: View {
     // MARK: - Sections
 
     private var dateSection: some View {
-        DatePicker("날짜", selection: $date, in: ...Date.now, displayedComponents: .date)
+        DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
             .environment(\.locale, Locale(identifier: "ko_KR"))
             .foregroundStyle(FeeloColor.textPrimary)
             .padding(.horizontal, 16)
@@ -98,8 +85,8 @@ struct RetrospectiveWriteView: View {
 
             LazyVGrid(columns: gridColumns, spacing: 8) {
                 ForEach(Emotion.allCases) { item in
-                    EmotionPickerCard(emotion: item, isSelected: item == emotion) {
-                        emotion = item
+                    EmotionPickerCard(emotion: item, isSelected: item == draft.emotion) {
+                        draft.emotion = item
                     }
                 }
             }
@@ -119,18 +106,16 @@ struct RetrospectiveWriteView: View {
                 .padding(.top, 8)
 
             VStack(alignment: .trailing, spacing: 8) {
-                TextEditor(text: $content)
+                TextEditor(text: $draft.content)
                     .font(.body)
                     .foregroundStyle(FeeloColor.textPrimary)
                     .scrollContentBackground(.hidden)
                     .frame(minHeight: 120)
-                    .onChange(of: content) { _, newValue in
-                        if newValue.count > Self.maxLength {
-                            content = String(newValue.prefix(Self.maxLength))
-                        }
+                    .onChange(of: draft.content) {
+                        draft.clampContent()
                     }
 
-                Text("\(content.count) / \(Self.maxLength)")
+                Text("\(draft.content.count) / \(RetrospectiveDraft.maxLength)")
                     .font(.footnote)
                     .foregroundStyle(FeeloColor.textSecondary)
             }
@@ -150,33 +135,22 @@ struct RetrospectiveWriteView: View {
     // MARK: - Save
 
     private func save() {
-        guard let emotion else { return }
-        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
-        let calendar = Calendar.current
+        guard let emotion = draft.emotion else { return }
 
         if let retrospective {
             // 날짜를 바꿔도 기존 작성 시각(시·분)은 유지한다.
-            retrospective.date = combine(day: date, timeFrom: retrospective.date, calendar: calendar)
-            retrospective.content = trimmed
+            retrospective.date = draft.combinedDate(timeFrom: retrospective.date)
+            retrospective.content = draft.trimmedContent
             retrospective.emotion = emotion
         } else {
             let newItem = Retrospective(
-                date: combine(day: date, timeFrom: .now, calendar: calendar),
-                content: trimmed,
+                date: draft.combinedDate(timeFrom: .now),
+                content: draft.trimmedContent,
                 emotion: emotion
             )
             modelContext.insert(newItem)
         }
         dismiss()
-    }
-
-    private func combine(day: Date, timeFrom time: Date, calendar: Calendar) -> Date {
-        var parts = calendar.dateComponents([.year, .month, .day], from: day)
-        let timeParts = calendar.dateComponents([.hour, .minute, .second], from: time)
-        parts.hour = timeParts.hour
-        parts.minute = timeParts.minute
-        parts.second = timeParts.second
-        return calendar.date(from: parts) ?? day
     }
 }
 
