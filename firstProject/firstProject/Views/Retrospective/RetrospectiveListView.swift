@@ -9,7 +9,7 @@ struct RetrospectiveListView: View {
     @State private var selectedDate = Date.now
     @State private var isWriting = false
 
-    private let calculator = RetrospectiveCalculator()
+    private var calendar: Calendar { .current }
 
     var body: some View {
         NavigationStack {
@@ -122,17 +122,20 @@ struct RetrospectiveListView: View {
     // MARK: - Data
 
     private var monthSummary: String {
-        calculator.monthSummary(of: retrospectives, month: displayedMonth)
+        Retrospective.monthSummary(of: retrospectives, month: displayedMonth)
     }
 
     private func latestRetrospective(on date: Date) -> Retrospective? {
-        calculator.latest(in: retrospectives, on: date)
+        Retrospective.latest(in: retrospectives, on: date)
     }
 
     private func moveMonth(by value: Int) {
-        guard let result = calculator.movedMonth(from: displayedMonth, by: value) else { return }
-        displayedMonth = result.month
-        selectedDate = result.selectedDate
+        guard let moved = calendar.date(byAdding: .month, value: value, to: displayedMonth) else { return }
+        displayedMonth = moved
+        // 선택한 날짜가 보이는 달을 벗어나지 않도록 이번 달이면 오늘, 아니면 그 달 1일로 옮긴다.
+        if let start = calendar.dateInterval(of: .month, for: moved)?.start {
+            selectedDate = calendar.isDate(moved, equalTo: .now, toGranularity: .month) ? .now : start
+        }
     }
 }
 
