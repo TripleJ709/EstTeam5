@@ -5,24 +5,17 @@ struct RetrospectiveListView: View {
     @Query(sort: \Retrospective.date, order: .reverse)
     private var retrospectives: [Retrospective]
 
-    @State private var displayedMonth = Self.initialSelectedDate
-    @State private var selectedDate = Self.initialSelectedDate
+    @State private var displayedMonth = Date.now
+    @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
 
     private var calendar: Calendar { .current }
-    private var today: Date { AppClock.now }
+    private var today: Date { .now }
 
     /// 작성 시트를 열 때 채워 둘 날짜
     private struct WriteRequest: Identifiable {
         let id = UUID()
         let date: Date
-    }
-
-    private static var initialSelectedDate: Date {
-        #if DEBUG
-        if DebugSample.isSeeding { return DebugSample.selectedDate }
-        #endif
-        return AppClock.now
     }
 
     var body: some View {

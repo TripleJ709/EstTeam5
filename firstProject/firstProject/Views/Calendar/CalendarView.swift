@@ -6,9 +6,9 @@ struct CalendarView: View {
     let month: Date
     let retrospectives: [Retrospective]
     @Binding var selectedDate: Date
-    var today: Date = AppClock.now
+    var today: Date = .now
     /// 이 날짜 이전에는 "기록 안 한 날" 점선을 그리지 않는다.
-    var installDate: Date = AppClock.installDate
+    var installDate: Date = AppConfig.installDate
 
     /// 요일 기호를 한글(일 월 화…)로 보여주기 위해 로케일을 고정한다.
     private var calendar: Calendar {
