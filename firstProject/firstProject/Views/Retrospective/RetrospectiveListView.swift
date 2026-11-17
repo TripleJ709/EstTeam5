@@ -7,6 +7,7 @@ struct RetrospectiveListView: View {
 
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
+    @State private var isWriting = false
 
     private var calendar: Calendar { .current }
 
@@ -31,12 +32,17 @@ struct RetrospectiveListView: View {
             .navigationTitle("회고")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        RetrospectiveWriteView()
+                    Button {
+                        isWriting = true
                     } label: {
                         Image(systemName: "plus")
                             .accessibilityLabel("회고 작성")
                     }
+                }
+            }
+            .sheet(isPresented: $isWriting) {
+                NavigationStack {
+                    RetrospectiveWriteView()
                 }
             }
         }
