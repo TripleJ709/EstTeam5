@@ -2,7 +2,7 @@ import Foundation
 
 enum AppConfig {
     static let apiKeyInfoKey = "OPENAI_API_KEY"
-    static let openAIModel = "gpt-4o-mini"
+    static let openAIModel = "gpt-6-luna"
     static var openAIAPIKey: String? {
         apiKey(from: Bundle.main.object(forInfoDictionaryKey: apiKeyInfoKey))
     }
