@@ -25,6 +25,10 @@ struct RetrospectiveDraft {
         emotion != nil && !trimmedContent.isEmpty
     }
 
+    var canRecommend: Bool {
+        !trimmedContent.isEmpty
+    }
+
     mutating func clampContent() {
         if content.count > Self.maxLength {
             content = String(content.prefix(Self.maxLength))

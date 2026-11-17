@@ -8,7 +8,10 @@ struct RetrospectiveWriteView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var draft: RetrospectiveDraft
+    @State private var recommendation: RecommendationState = .idle
+    @State private var recommendTask: Task<Void, Never>?
 
+    private let recommender = EmotionRecommender()
     private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
 
     init(retrospective: Retrospective? = nil) {
@@ -33,12 +36,14 @@ struct RetrospectiveWriteView: View {
                     dateSection
                     emotionSection
                     contentSection
+                    recommendSection
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 40)
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        .onDisappear { recommendTask?.cancel() }
         .navigationTitle(retrospective == nil ? "새 회고" : "회고 편집")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -125,11 +130,74 @@ struct RetrospectiveWriteView: View {
         }
     }
 
+    private var recommendSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                recommend()
+            } label: {
+                HStack(spacing: 8) {
+                    if recommendation == .loading {
+                        ProgressView()
+                    } else {
+                        Image(systemName: "sparkles")
+                    }
+                    Text(recommendation == .loading ? "감정을 분석하는 중" : "AI로 감정 추천받기")
+                }
+                .font(.body.weight(.medium))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.bordered)
+            .disabled(!draft.canRecommend || recommendation == .loading)
+
+            recommendationNote
+                .font(.footnote)
+                .padding(.horizontal, 16)
+        }
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    private var recommendationNote: some View {
+        switch recommendation {
+        case .recommended(let emotion) where draft.emotion == emotion:
+            Text("AI가 \(emotion.displayName) 감정을 추천했어요. 위에서 직접 바꿀 수도 있어요.")
+                .foregroundStyle(FeeloColor.textSecondary)
+        case .failed(let message):
+            Text(message)
+                .foregroundStyle(.red)
+        default:
+            Text("")
+                .foregroundStyle(FeeloColor.textSecondary)
+        }
+    }
+
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.subheadline.weight(.medium))
             .foregroundStyle(FeeloColor.textSecondary)
             .padding(.horizontal, 16)
+    }
+
+    // MARK: - Recommend
+
+    private func recommend() {
+        guard draft.canRecommend, recommendation != .loading else { return }
+        let content = draft.trimmedContent
+        recommendation = .loading
+        recommendTask = Task {
+            do {
+                let emotion = try await recommender.recommend(for: content)
+                draft.emotion = emotion
+                recommendation = .recommended(emotion)
+            } catch is CancellationError {
+                recommendation = .idle
+            } catch let error as EmotionRecommenderError {
+                recommendation = .failed(error.userMessage)
+            } catch {
+                recommendation = .failed(EmotionRecommenderError.invalidResponse.userMessage)
+            }
+        }
     }
 
     // MARK: - Save
@@ -152,6 +220,13 @@ struct RetrospectiveWriteView: View {
         }
         dismiss()
     }
+}
+
+private enum RecommendationState: Equatable {
+    case idle
+    case loading
+    case recommended(Emotion)
+    case failed(String)
 }
 
 // MARK: - Emotion picker card
