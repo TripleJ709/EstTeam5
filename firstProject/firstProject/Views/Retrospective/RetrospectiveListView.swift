@@ -9,7 +9,7 @@ struct RetrospectiveListView: View {
     @State private var selectedDate = Date.now
     @State private var isWriting = false
 
-    private var calendar: Calendar { .current }
+    private let calculator = RetrospectiveCalculator()
 
     var body: some View {
         NavigationStack {
@@ -121,33 +121,18 @@ struct RetrospectiveListView: View {
 
     // MARK: - Data
 
-    private var monthRetrospectives: [Retrospective] {
-        retrospectives.filter { calendar.isDate($0.date, equalTo: displayedMonth, toGranularity: .month) }
-    }
-
-    /// "이번 달은 기쁨이 가장 많았어요 · 13개의 기록"
     private var monthSummary: String {
-        let items = monthRetrospectives
-        guard !items.isEmpty else { return "이번 달은 아직 기록이 없어요" }
-        let counts = Dictionary(grouping: items, by: \.emotion).mapValues(\.count)
-        // 동률이면 Emotion 선언 순서가 앞선 감정을 고른다.
-        let top = Emotion.allCases.max { (counts[$0] ?? 0) < (counts[$1] ?? 0) } ?? .fallback
-        return "이번 달은 \(top.displayName)\(top.subjectParticle) 가장 많았어요 · \(items.count)개의 기록"
+        calculator.monthSummary(of: retrospectives, month: displayedMonth)
     }
 
     private func latestRetrospective(on date: Date) -> Retrospective? {
-        retrospectives
-            .filter { calendar.isDate($0.date, inSameDayAs: date) }
-            .max { $0.createdAt < $1.createdAt }
+        calculator.latest(in: retrospectives, on: date)
     }
 
     private func moveMonth(by value: Int) {
-        guard let moved = calendar.date(byAdding: .month, value: value, to: displayedMonth) else { return }
-        displayedMonth = moved
-        // 선택한 날짜가 보이는 달을 벗어나지 않도록 같은 달의 1일로 옮긴다.
-        if let start = calendar.dateInterval(of: .month, for: moved)?.start {
-            selectedDate = calendar.isDate(moved, equalTo: .now, toGranularity: .month) ? .now : start
-        }
+        guard let result = calculator.movedMonth(from: displayedMonth, by: value) else { return }
+        displayedMonth = result.month
+        selectedDate = result.selectedDate
     }
 }
 
@@ -191,15 +176,6 @@ private struct RetroPreviewCard: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: FeeloRadius.card))
-    }
-}
-
-private extension Emotion {
-    /// 받침 유무에 따라 주격 조사 "이/가"를 돌려준다.
-    var subjectParticle: String {
-        guard let last = displayName.unicodeScalars.last,
-              (0xAC00...0xD7A3).contains(last.value) else { return "이" }
-        return (last.value - 0xAC00) % 28 == 0 ? "가" : "이"
     }
 }
 
