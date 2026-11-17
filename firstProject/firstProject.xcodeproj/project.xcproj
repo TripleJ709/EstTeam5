@@ -1,8 +1,8 @@
 {
   "default-configuration": "Release",
   "configurations": [
-    "Debug",
-    "Release",
+    { "name": "Debug", "file": "Base.xcconfig" },
+    { "name": "Release", "file": "Base.xcconfig" },
   ],
   "localizations": {
     "development": "en",
@@ -12,6 +12,7 @@
   },
   "files": [
     { "kind": "folder", "path": "firstProject", "target-membership": [ "firstProject" ] },
+    { "path": "Config/Base.xcconfig" },
     {
       "kind": "group",
       "name": "Products",
