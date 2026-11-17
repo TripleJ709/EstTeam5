@@ -7,6 +7,6 @@ struct firstProjectApp: App {
         WindowGroup {
             MainTabView()
         }
-        .modelContainer(for: [Retrospective.self, Category.self])
+        .modelContainer(for: Retrospective.self)
     }
 }

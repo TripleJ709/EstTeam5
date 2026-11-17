@@ -20,5 +20,5 @@ struct RetrospectiveListView: View {
 
 #Preview {
     RetrospectiveListView()
-        .modelContainer(for: [Retrospective.self, Category.self], inMemory: true)
+        .modelContainer(for: Retrospective.self, inMemory: true)
 }
