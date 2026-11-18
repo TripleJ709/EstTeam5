@@ -8,7 +8,7 @@ struct RetrospectiveListView: View {
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
-    @State private var isShowingSettings = false
+    @State private var isShowingThemeAlert = false
 
     private var calendar: Calendar { .current }
     private var today: Date { .now }
@@ -41,10 +41,10 @@ struct RetrospectiveListView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        isShowingSettings = true
+                        isShowingThemeAlert = true
                     } label: {
                         Image(systemName: "gearshape")
-                            .accessibilityLabel("화면 설정")
+                            .accessibilityLabel("테마 설정")
                     }
                     .tint(FeeloColor.tint)
                 }
@@ -59,8 +59,15 @@ struct RetrospectiveListView: View {
                     .tint(FeeloColor.tint)
                 }
             }
-            .sheet(isPresented: $isShowingSettings) {
-                DisplaySettingsView()
+            .alert("테마", isPresented: $isShowingThemeAlert) {
+                ForEach(AppTheme.allCases) { theme in
+                    Button(theme.title) {
+                        // TODO: 선택한 테마 저장 및 적용
+                    }
+                }
+                Button("취소", role: .cancel) {}
+            } message: {
+                Text("앱의 화면 모드를 선택하세요.")
             }
             .sheet(item: $writeRequest) { request in
                 NavigationStack {
