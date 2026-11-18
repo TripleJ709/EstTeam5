@@ -8,7 +8,7 @@
 import Foundation
 
 extension Emotion {
-    var weeklyFeedback: String? {
+    var weeklyFeedback: String {
         switch self {
         case .joy: "이번 주는 웃음과 기쁨이 가득했구나. 이 순간을 마음껏 누리고 행복을 온전히 만끽해 줘."
         case .achievement : "이번 주는 해낸 일이 많았구나. 그 만큼 애쓴 나를 충분히 칭찬해줘"
@@ -20,7 +20,7 @@ extension Emotion {
         }
     }
     
-    var monthlyFeedback : String? {
+    var monthlyFeedback: String {
         switch self {
         case .joy: "이번 달은 유독 반짝이는 기쁨이 많았구나. 일상의 행복을 놓치지 않고 잘 발견해 낸 나에게 고마워하고, 이 따뜻한 에너지를 마음 깊숙이 저장해 줘."
         case .achievement : "이번 달은 묵묵히 해낸 일들이 참 많았구나. 한 걸음씩 성실하게 쌓아 올린 나의 시간들을 자랑스러워하고 스스로에게 큰 박수를 보내 줘."

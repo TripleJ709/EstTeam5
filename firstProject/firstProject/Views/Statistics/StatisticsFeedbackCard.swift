@@ -41,30 +41,25 @@ import SwiftUI
  }
  
 #Preview("주간") {
-     ScrollView {
-         VStack(spacing: 12) {
-             ForEach(Emotion.allCases) { emotion in
-                 if let message = emotion.weeklyFeedback {
-                     StatisticsFeedbackCard(emotion: emotion, title: "이번 주의 한마디", message: message)
-                 }
-             }
-         }
-         .padding(16)
-     }
-     .background(FeeloColor.bgApp)
- }
- 
- #Preview("월간") {
-     ScrollView {
-         VStack(spacing: 12) {
-             ForEach(Emotion.allCases) { emotion in
-                 if let message = emotion.monthlyFeedback {
-                     StatisticsFeedbackCard(emotion: emotion, title: "이번 달의 한마디", message: message)
-                 }
-             }
-         }
-         .padding(16)
-     }
-     .background(FeeloColor.bgApp)
- }
+    ScrollView {
+        VStack(spacing: 12) {
+            ForEach(Emotion.allCases) { emotion in
+                StatisticsFeedbackCard(emotion: emotion, title: "이번 주의 한마디", message: emotion.weeklyFeedback)
+            }
+        }
+        .padding(16)
+    }
+    .background(FeeloColor.bgApp)
+}
 
+#Preview("월간") {
+    ScrollView {
+        VStack(spacing: 12) {
+            ForEach(Emotion.allCases) { emotion in
+                StatisticsFeedbackCard(emotion: emotion, title: "이번 달의 한마디", message: emotion.monthlyFeedback)
+            }
+        }
+        .padding(16)
+    }
+    .background(FeeloColor.bgApp)
+}
