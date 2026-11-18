@@ -2,7 +2,6 @@ import Charts
 import SwiftData
 import SwiftUI
 
-/// 통계 탭 (Figma "제안 D · 통계")
 struct StatisticsView: View {
     @Query(sort: \Retrospective.date)
     private var retrospectives: [Retrospective]
@@ -49,9 +48,6 @@ struct StatisticsView: View {
         .tint(FeeloColor.tint)
     }
 
-    // MARK: - Data
-
-    /// 선택한 기간(주 또는 월)의 모든 날짜
     private var periodDays: [Date] {
         guard let interval = calendar.dateInterval(of: period.calendarComponent, for: anchorDate) else { return [] }
         var result: [Date] = []
@@ -68,7 +64,6 @@ struct StatisticsView: View {
         retrospectives.filter { calendar.isDate($0.date, equalTo: anchorDate, toGranularity: period.calendarComponent) }
     }
 
-    /// 감정별 기록 수 (많은 순, 동률이면 Emotion 선언 순서)
     private var emotionCounts: [(emotion: Emotion, count: Int)] {
         let counts = Dictionary(grouping: periodRetrospectives, by: \.emotion).mapValues(\.count)
         return Emotion.allCases
@@ -76,7 +71,6 @@ struct StatisticsView: View {
             .sorted { $0.count > $1.count }
     }
 
-    /// 같은 날 기록이 여러 개면 가장 최근에 작성한 기록의 감정
     private func emotion(on day: Date) -> Emotion? {
         periodRetrospectives
             .filter { calendar.isDate($0.date, inSameDayAs: day) }
@@ -100,8 +94,6 @@ struct StatisticsView: View {
             anchorDate = moved
         }
     }
-
-    // MARK: - Sections
 
     private var periodNavigation: some View {
         HStack(spacing: 0) {
@@ -265,8 +257,6 @@ struct StatisticsView: View {
             .padding(.top, 8)
     }
 }
-
-// MARK: - Components
 
 private struct StatCard<Value: View>: View {
     let label: String

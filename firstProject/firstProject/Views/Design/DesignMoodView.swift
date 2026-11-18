@@ -1,6 +1,5 @@
-		import SwiftUI
+import SwiftUI
 
-/// Figma "01 디자인 키워드 & 무드" 프레임 (node 67:13)
 struct DesignMoodView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
 
@@ -59,8 +58,6 @@ struct DesignMoodView: View {
     }
 }
 
-// MARK: - Keyword
-
 private struct MoodKeyword: Identifiable {
     let title: String
     let english: String
@@ -96,10 +93,7 @@ private struct KeywordRow: View {
     }
 }
 
-// MARK: - Mood visual
-
 private struct MoodAuraCard: View {
-    /// Figma 원본(620 x 440) 기준 좌표
     private static let designSize = CGSize(width: 620, height: 440)
 
     private struct Aura: Identifiable {
@@ -144,7 +138,6 @@ private struct MoodAuraCard: View {
     }
 }
 
-/// 2색 방사형 그라데이션 + 블러로 표현한 감정 구슬
 private struct EmotionAuraBall: View {
     let emotion: Emotion
     let diameter: CGFloat
