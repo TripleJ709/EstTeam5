@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 
-/// 회고 상세 (Figma "제안 B · 회고 상세")
 struct RetrospectiveDetailView: View {
     let retrospective: Retrospective
 
@@ -16,7 +15,6 @@ struct RetrospectiveDetailView: View {
         ZStack(alignment: .top) {
             FeeloColor.bgApp.ignoresSafeArea()
 
-            // 화면 위로 번지는 감정 아우라
             EmotionWash(emotion: retrospective.emotion)
                 .offset(y: -90)
                 .ignoresSafeArea()
@@ -58,7 +56,6 @@ struct RetrospectiveDetailView: View {
         }
     }
 
-    /// "11월 16일 (월)"
     private var navigationTitleText: String {
         let day = retrospective.date.formatted(.dateTime.month().day().locale(Self.locale))
         let weekday = retrospective.date.formatted(.dateTime.weekday(.abbreviated).locale(Self.locale))

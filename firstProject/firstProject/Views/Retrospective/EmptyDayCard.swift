@@ -1,11 +1,9 @@
 import SwiftUI
 
-/// 선택한 날에 기록이 없을 때 보여주는 카드 (Figma "Empty State Card")
 struct EmptyDayCard: View {
     struct Content {
         let title: String
         let message: String
-        /// nil이면 버튼 없이 안내만 보여준다.
         let buttonTitle: String?
     }
 

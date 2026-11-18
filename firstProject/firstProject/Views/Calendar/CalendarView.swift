@@ -1,16 +1,12 @@
 import SwiftUI
 
-/// 월간 감정 달력 (Figma "제안 A · 회고 달력")
 struct CalendarView: View {
-    /// 표시할 달에 포함된 임의의 날짜
     let month: Date
     let retrospectives: [Retrospective]
     @Binding var selectedDate: Date
-    var today: Date = AppClock.now
-    /// 이 날짜 이전에는 "기록 안 한 날" 점선을 그리지 않는다.
-    var installDate: Date = AppClock.installDate
+    var today: Date = .now
+    var installDate: Date = AppConfig.installDate
 
-    /// 요일 기호를 한글(일 월 화…)로 보여주기 위해 로케일을 고정한다.
     private var calendar: Calendar {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
@@ -58,9 +54,6 @@ struct CalendarView: View {
         .accessibilityHidden(true)
     }
 
-    // MARK: - Data
-
-    /// 달력에 그릴 날짜. 첫 주와 마지막 주의 앞뒤는 이웃 달 날짜로 채운다.
     private var days: [Date] {
         guard let monthInterval = calendar.dateInterval(of: .month, for: month),
               let firstWeek = calendar.dateInterval(of: .weekOfMonth, for: monthInterval.start),
@@ -78,7 +71,6 @@ struct CalendarView: View {
         return result
     }
 
-    /// 같은 날 기록이 여러 개면 가장 최근에 작성한 기록의 감정을 보여준다.
     private func emotion(on date: Date) -> Emotion? {
         retrospectives
             .filter { calendar.isDate($0.date, inSameDayAs: date) }
@@ -86,7 +78,6 @@ struct CalendarView: View {
             .emotion
     }
 
-    /// 기록이 있으면 감정 구슬, 사용 시작일 이후의 지난 날에 기록이 없으면 점선, 그 외는 비워 둔다.
     private func marker(for date: Date) -> DayCell.Marker {
         guard calendar.isDate(date, equalTo: month, toGranularity: .month) else { return .none }
         if let emotion = emotion(on: date) { return .emotion(emotion) }
@@ -97,8 +88,6 @@ struct CalendarView: View {
         return .none
     }
 }
-
-// MARK: - Day cell
 
 private struct DayCell: View {
     enum Marker: Equatable { case none, missed, emotion(Emotion) }
@@ -111,7 +100,6 @@ private struct DayCell: View {
     let marker: Marker
     let action: () -> Void
 
-    /// 선택한 날과 오늘은 굵은 Ink 숫자로 보여준다.
     private var isEmphasized: Bool { isSelected || isToday }
 
     var body: some View {
