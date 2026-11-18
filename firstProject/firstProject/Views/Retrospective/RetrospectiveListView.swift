@@ -8,6 +8,7 @@ struct RetrospectiveListView: View {
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
+    @State private var isShowingSettings = false
 
     private var calendar: Calendar { .current }
     private var today: Date { .now }
@@ -39,8 +40,10 @@ struct RetrospectiveListView: View {
             .navigationTitle("회고")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {} label: {
-                        Image(systemName: "circle.lefthalf.filled")
+                    Button {
+                        isShowingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
                             .accessibilityLabel("화면 설정")
                     }
                     .tint(FeeloColor.tint)
@@ -55,6 +58,9 @@ struct RetrospectiveListView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(FeeloColor.tint)
                 }
+            }
+            .sheet(isPresented: $isShowingSettings) {
+                DisplaySettingsView()
             }
             .sheet(item: $writeRequest) { request in
                 NavigationStack {
