@@ -6,13 +6,17 @@ struct RetrospectiveWriteView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     @State private var draft: RetrospectiveDraft
     @State private var recommendation: RecommendationState = .idle
     @State private var recommendTask: Task<Void, Never>?
 
     private let recommender = EmotionRecommender()
-    private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
+    private var gridColumns: [GridItem] {
+        let count = typeSize.isAccessibilitySize ? 2 : (typeSize >= .xxLarge ? 3 : 4)
+        return Array(repeating: GridItem(.flexible(), spacing: 8), count: count)
+    }
 
     init(retrospective: Retrospective? = nil, date: Date? = nil) {
         self.retrospective = retrospective
@@ -72,13 +76,31 @@ struct RetrospectiveWriteView: View {
     }
 
     private var dateSection: some View {
+        let layout = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout())
+
+        return layout {
+            Text("날짜")
+            if typeSize.isAccessibilitySize {
+                datePicker
+            } else {
+                Spacer()
+                datePicker
+            }
+        }
+        .foregroundStyle(FeeloColor.textPrimary)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+        .padding(.top, 8)
+    }
+
+    private var datePicker: some View {
         DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
+            .labelsHidden()
             .environment(\.locale, Locale(identifier: "ko_KR"))
-            .foregroundStyle(FeeloColor.textPrimary)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-            .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
-            .padding(.top, 8)
     }
 
     private var emotionSection: some View {

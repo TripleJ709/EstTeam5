@@ -1,14 +1,15 @@
 import SwiftUI
 
 enum FeeloColor {
-    static let bgApp = Color(hex: 0xF7F3EE)
-    static let bgCard = Color.white
-    static let bgSelected = Color(hex: 0xE9E5F3)
-    static let textPrimary = Color(hex: 0x232946)
-    static let textSecondary = Color(hex: 0x6B6880)
-    static let tint = Color(hex: 0x232946)
-    static let borderDashed = Color(hex: 0xC9C3D9)
-    static let destructive = Color(hex: 0xFF383C)
+    static let bgApp = Color("BgApp")
+    static let bgCard = Color("BgCard")
+    static let bgSelected = Color("BgSelected")
+    static let textPrimary = Color("TextPrimary")
+    static let textSecondary = Color("TextSecondary")
+    static let tint = Color("TintPrimary")
+    static let onTint = Color("TintOnPrimary")
+    static let borderDashed = Color("BorderDashed")
+    static let destructive = Color("StatusDestructive")
 }
 
 enum FeeloRadius {
