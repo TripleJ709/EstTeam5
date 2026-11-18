@@ -1,4 +1,3 @@
-import Charts
 import SwiftData
 import SwiftUI
 
@@ -11,6 +10,7 @@ struct StatisticsView: View {
 
     private var calendar: Calendar { .current }
     private static let locale = Locale(identifier: "ko_KR")
+    private static let emptyMessage = "회고를 남기면 감정 흐름과 분포가 채워져요"
 
     enum Period: String, CaseIterable, Identifiable {
         case week = "주간"
@@ -21,6 +21,34 @@ struct StatisticsView: View {
             switch self {
             case .week: .weekOfYear
             case .month: .month
+            }
+        }
+
+        var recordCountLabel: String {
+            switch self {
+            case .week: "이번 주 기록"
+            case .month: "이번 달 기록"
+            }
+        }
+
+        var emptyTitle: String {
+            switch self {
+            case .week: "이 주에는 기록이 없어요"
+            case .month: "이 달에는 기록이 없어요"
+            }
+        }
+
+        var feedbackTitle: String {
+            switch self {
+            case .week: "이번 주의 한마디"
+            case .month: "이번 달의 한마디"
+            }
+        }
+
+        func feedback(for emotion: Emotion) -> String? {
+            switch self {
+            case .week: emotion.weeklyFeedback
+            case .month: emotion.monthlyFeedback
             }
         }
     }
@@ -37,15 +65,42 @@ struct StatisticsView: View {
 
                     periodNavigation
                     summaryCards
-                    flowSection
-                    distributionSection
+                    content
                 }
                 .padding(.bottom, 24)
             }
-            .background(FeeloColor.bgApp.ignoresSafeArea())
-            .navigationTitle("통계")
+            .background { screenBackground }
+            .navigationTitle("감정 돌아보기")
         }
         .tint(FeeloColor.tint)
+    }
+
+    private var screenBackground: some View {
+        ZStack(alignment: .top) {
+            FeeloColor.bgApp
+
+            if let top = emotionCounts.first?.emotion {
+                EmotionWash(emotion: top, opacity: 0.55, blur: 30)
+                    .scaleEffect(1.8)
+                    .offset(y: 160)
+                    .animation(.easeInOut(duration: 0.25), value: top)
+            }
+        }
+        .ignoresSafeArea()
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let top = emotionCounts.first?.emotion {
+            distributionSection(highlighted: top)
+            if let message = period.feedback(for: top), !message.isEmpty {
+                StatisticsFeedbackCard(emotion: top, title: period.feedbackTitle, message: message)
+                    .padding(.horizontal, 16)
+            }
+        } else {
+            StatisticsEmptyState(title: period.emptyTitle, message: Self.emptyMessage)
+                .padding(.horizontal, 16)
+        }
     }
 
     private var periodDays: [Date] {
@@ -71,21 +126,17 @@ struct StatisticsView: View {
             .sorted { $0.count > $1.count }
     }
 
-    private func emotion(on day: Date) -> Emotion? {
-        periodRetrospectives
-            .filter { calendar.isDate($0.date, inSameDayAs: day) }
-            .max { $0.createdAt < $1.createdAt }?
-            .emotion
-    }
-
     private var periodTitle: String {
         switch period {
         case .month:
-            return anchorDate.formatted(.dateTime.year().month(.defaultDigits).locale(Self.locale))
+            return anchorDate.formatted(.dateTime.year().month(.wide).locale(Self.locale))
         case .week:
             guard let first = periodDays.first, let last = periodDays.last else { return "" }
-            let style = Date.FormatStyle.dateTime.month().day().locale(Self.locale)
-            return "\(first.formatted(style)) ~ \(last.formatted(style))"
+            let startStyle = Date.FormatStyle.dateTime.month().day().locale(Self.locale)
+            let endStyle = calendar.isDate(first, equalTo: last, toGranularity: .month)
+                ? Date.FormatStyle.dateTime.day().locale(Self.locale)
+                : startStyle
+            return "\(first.formatted(startStyle)) – \(last.formatted(endStyle))"
         }
     }
 
@@ -123,7 +174,7 @@ struct StatisticsView: View {
 
     private var summaryCards: some View {
         HStack(spacing: 12) {
-            StatCard(label: period == .month ? "이번 달 회고" : "이번 주 회고") {
+            StatCard(label: period.recordCountLabel) {
                 Text("\(periodRetrospectives.count)건")
             }
             StatCard(label: "가장 많은 감정") {
@@ -140,113 +191,18 @@ struct StatisticsView: View {
         .padding(.horizontal, 16)
     }
 
-    private var flowSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionTitle(period == .month ? "한 달 감정 흐름" : "한 주 감정 흐름")
-
-            VStack(alignment: .leading, spacing: 8) {
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(maximum: 28), spacing: 2), count: 15),
-                    alignment: .leading,
-                    spacing: 2
-                ) {
-                    ForEach(periodDays, id: \.self) { day in
-                        FlowCell(state: flowState(for: day))
-                            .aspectRatio(1, contentMode: .fit)
-                    }
-                }
-
-                HStack {
-                    Text(periodDays.first?.formatted(.dateTime.month().day().locale(Self.locale)) ?? "")
-                    Spacer()
-                    Text(periodDays.last?.formatted(.dateTime.day().locale(Self.locale)) ?? "")
-                }
-                .font(.caption2)
-                .foregroundStyle(FeeloColor.textSecondary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 14)
-            .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("감정 흐름")
-            .accessibilityValue(flowAccessibilityValue)
+    private var emotionDistribution: [(emotion: Emotion, count: Int)] {
+        Emotion.allCases.map { emotion in
+            (emotion, emotionCounts.first { $0.emotion == emotion }?.count ?? 0)
         }
-        .padding(.horizontal, 16)
     }
 
-    private func flowState(for day: Date) -> FlowCell.CellState {
-        if let emotion = emotion(on: day) { return .recorded(emotion) }
-        return day > .now ? .future : .missed
-    }
-
-    private var flowAccessibilityValue: String {
-        guard !emotionCounts.isEmpty else { return "기록 없음" }
-        return emotionCounts.map { "\($0.emotion.displayName) \($0.count)회" }.joined(separator: ", ")
-    }
-
-    private var distributionSection: some View {
+    private func distributionSection(highlighted: Emotion) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("감정 분포")
-
-            Group {
-                if emotionCounts.isEmpty {
-                    Text("이 기간에는 기록이 없어요")
-                        .font(.subheadline)
-                        .foregroundStyle(FeeloColor.textSecondary)
-                        .frame(maxWidth: .infinity, minHeight: 132)
-                } else {
-                    HStack(spacing: 20) {
-                        donut
-                        legend
-                    }
-                }
-            }
-            .padding(16)
-            .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+            EmotionBarChart(items: emotionDistribution, highlighted: highlighted)
         }
         .padding(.horizontal, 16)
-    }
-
-    private var donut: some View {
-        Chart(emotionCounts, id: \.emotion) { item in
-            SectorMark(
-                angle: .value("기록", item.count),
-                innerRadius: .ratio(0.62),
-                angularInset: 1
-            )
-            .foregroundStyle(item.emotion.auraEnd)
-        }
-        .frame(width: 132, height: 132)
-        .overlay {
-            VStack(spacing: 0) {
-                Text("\(periodRetrospectives.count)")
-                    .font(.title.bold())
-                    .foregroundStyle(FeeloColor.textPrimary)
-                Text("기록")
-                    .font(.footnote)
-                    .foregroundStyle(FeeloColor.textSecondary)
-            }
-        }
-        .accessibilityHidden(true)
-    }
-
-    private var legend: some View {
-        let total = max(periodRetrospectives.count, 1)
-        return VStack(spacing: 6) {
-            ForEach(emotionCounts, id: \.emotion) { item in
-                HStack(spacing: 8) {
-                    EmotionAuraView(emotion: item.emotion, size: 10)
-                    Text(item.emotion.displayName)
-                        .foregroundStyle(FeeloColor.textPrimary)
-                    Spacer(minLength: 4)
-                    Text("\(item.count)회 · \(Int((Double(item.count) / Double(total) * 100).rounded()))%")
-                        .foregroundStyle(FeeloColor.textSecondary)
-                }
-                .font(.subheadline)
-            }
-        }
-        .frame(maxWidth: .infinity)
     }
 
     private func sectionTitle(_ title: String) -> some View {
@@ -274,37 +230,8 @@ private struct StatCard<Value: View>: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.summary))
         .accessibilityElement(children: .combine)
-    }
-}
-
-private struct FlowCell: View {
-    enum CellState {
-        case recorded(Emotion)
-        case missed
-        case future
-    }
-
-    let state: CellState
-
-    var body: some View {
-        let shape = RoundedRectangle(cornerRadius: 6)
-        switch state {
-        case .recorded(let emotion):
-            shape.fill(
-                RadialGradient(
-                    colors: [emotion.auraStart, emotion.auraEnd],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: 15
-                )
-            )
-        case .missed:
-            shape.strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 2]))
-        case .future:
-            shape.fill(FeeloColor.bgSelected)
-        }
     }
 }
 
