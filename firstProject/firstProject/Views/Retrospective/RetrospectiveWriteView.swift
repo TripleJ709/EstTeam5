@@ -71,8 +71,6 @@ struct RetrospectiveWriteView: View {
         .presentationBackground(FeeloColor.bgApp)
     }
 
-    // MARK: - Sections
-
     private var dateSection: some View {
         DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
             .environment(\.locale, Locale(identifier: "ko_KR"))
@@ -179,8 +177,6 @@ struct RetrospectiveWriteView: View {
             .padding(.horizontal, 16)
     }
 
-    // MARK: - Recommend
-
     private func recommend() {
         guard draft.canRecommend, recommendation != .loading else { return }
         let content = draft.trimmedContent
@@ -200,13 +196,10 @@ struct RetrospectiveWriteView: View {
         }
     }
 
-    // MARK: - Save
-
     private func save() {
         guard let emotion = draft.emotion else { return }
 
         if let retrospective {
-            // 날짜를 바꿔도 기존 작성 시각(시·분)은 유지한다.
             retrospective.date = draft.combinedDate(timeFrom: retrospective.date)
             retrospective.content = draft.trimmedContent
             retrospective.emotion = emotion
@@ -228,8 +221,6 @@ private enum RecommendationState: Equatable {
     case recommended(Emotion)
     case failed(String)
 }
-
-// MARK: - Emotion picker card
 
 private struct EmotionPickerCard: View {
     let emotion: Emotion

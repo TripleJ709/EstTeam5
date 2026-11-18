@@ -1,13 +1,11 @@
 import SwiftUI
 
-/// Feelo 디자인 토큰 (Light 기준 값. Dark 값은 Figma 변수 확인 후 Color Set으로 이전 예정)
 enum FeeloColor {
     static let bgApp = Color(hex: 0xF7F3EE)
     static let bgCard = Color.white
     static let bgSelected = Color(hex: 0xE9E5F3)
     static let textPrimary = Color(hex: 0x232946)
     static let textSecondary = Color(hex: 0x6B6880)
-    /// 브랜드 Ink. 버튼·선택 강조(tint/primary)
     static let tint = Color(hex: 0x232946)
     static let borderDashed = Color(hex: 0xC9C3D9)
     static let destructive = Color(hex: 0xFF383C)
@@ -17,7 +15,6 @@ enum FeeloRadius {
     static let cell: CGFloat = 14
     static let control: CGFloat = 20
     static let card: CGFloat = 26
-    /// 월간 달력 카드
     static let calendar: CGFloat = 28
 }
 
@@ -32,7 +29,6 @@ extension Color {
 }
 
 extension Emotion {
-    /// 아우라 그라데이션 시작색(중심)
     var auraStart: Color {
         switch self {
         case .joy: Color(hex: 0xFFE066)
@@ -45,7 +41,6 @@ extension Emotion {
         }
     }
 
-    /// 아우라 그라데이션 끝색(가장자리)
     var auraEnd: Color {
         switch self {
         case .joy: Color(hex: 0xFFC43D)

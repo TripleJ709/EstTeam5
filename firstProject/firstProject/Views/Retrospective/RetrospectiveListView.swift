@@ -12,7 +12,6 @@ struct RetrospectiveListView: View {
     private var calendar: Calendar { .current }
     private var today: Date { .now }
 
-    /// 작성 시트를 열 때 채워 둘 날짜
     private struct WriteRequest: Identifiable {
         let id = UUID()
         let date: Date
@@ -40,7 +39,6 @@ struct RetrospectiveListView: View {
             .navigationTitle("회고")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    // 화면 설정(테마·글꼴) 시트는 05 화면 구현 때 연결한다.
                     Button {} label: {
                         Image(systemName: "circle.lefthalf.filled")
                             .accessibilityLabel("화면 설정")
@@ -65,8 +63,6 @@ struct RetrospectiveListView: View {
             }
         }
     }
-
-    // MARK: - Sections
 
     private var monthNavigation: some View {
         HStack(spacing: 0) {
@@ -149,9 +145,6 @@ struct RetrospectiveListView: View {
         .padding(.top, 1)
     }
 
-    // MARK: - Data
-
-    /// 선택한 날의 기록. 같은 날 여러 개면 최신순으로 모두 보여준다.
     private var selectedDayItems: [Retrospective] {
         retrospectives
             .filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
@@ -164,7 +157,6 @@ struct RetrospectiveListView: View {
         calendar.startOfDay(for: selectedDate) > calendar.startOfDay(for: today)
     }
 
-    /// "오늘 · 11월 16일 월요일 · 2개" 형식의 헤더
     private func previewHeader(count: Int) -> String {
         var text = selectedDate.formatted(.dateTime.month().day().weekday(.wide).locale(Locale(identifier: "ko_KR")))
         if isSelectedToday && count == 0 { text = "오늘 · " + text }
@@ -172,7 +164,6 @@ struct RetrospectiveListView: View {
         return text
     }
 
-    /// 선택한 날에 기록이 없을 때의 안내 문구(지난 날, 오늘, 미래, 첫 사용)
     private var emptyContent: EmptyDayCard.Content {
         if isSelectedFuture {
             return .init(title: "아직 오지 않은 날이에요", message: "그날이 되면 회고를 남길 수 있어요", buttonTitle: nil)
@@ -197,14 +188,11 @@ struct RetrospectiveListView: View {
     private func moveMonth(by value: Int) {
         guard let moved = calendar.date(byAdding: .month, value: value, to: displayedMonth) else { return }
         displayedMonth = moved
-        // 선택한 날짜가 보이는 달을 벗어나지 않도록 이번 달이면 오늘, 아니면 그 달 1일로 옮긴다.
         if let start = calendar.dateInterval(of: .month, for: moved)?.start {
             selectedDate = calendar.isDate(moved, equalTo: today, toGranularity: .month) ? today : start
         }
     }
 }
-
-// MARK: - Preview card
 
 private struct RetroPreviewCard: View {
     let emotion: Emotion
@@ -235,7 +223,6 @@ private struct RetroPreviewCard: View {
         .background {
             ZStack(alignment: .leading) {
                 FeeloColor.bgCard
-                // 카드 왼쪽에서 감정 색이 은은하게 번지는 배경
                 Ellipse()
                     .fill(RadialGradient(colors: [emotion.auraStart, emotion.auraEnd],
                                          center: .center, startRadius: 0, endRadius: 36))
