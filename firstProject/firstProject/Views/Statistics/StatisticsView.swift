@@ -7,6 +7,7 @@ struct StatisticsView: View {
 
     @State private var period: StatisticsPeriod = .month
     @State private var anchorDate = Date.now
+    @State private var weeklyAnalysis = WeeklyAnalysisStore()
 
     private static let emptyMessage = "회고를 남기면 감정 흐름과 분포가 채워져요"
 
@@ -38,6 +39,8 @@ struct StatisticsView: View {
             .navigationTitle("감정 돌아보기")
         }
         .tint(FeeloColor.tint)
+        .onChange(of: anchorDate) { weeklyAnalysis.reset() }
+        .onChange(of: period) { weeklyAnalysis.reset() }
     }
 
     private var screenBackground: some View {
@@ -60,6 +63,12 @@ struct StatisticsView: View {
             distributionSection(highlighted: top)
             StatisticsFeedbackCard(emotion: top, title: period.feedbackTitle, message: period.feedback(for: top))
                 .padding(.horizontal, 16)
+
+            if period == .week {
+                WeeklyAIReportSection(state: weeklyAnalysis.state, accentEmotion: top) {
+                    weeklyAnalysis.analyze(WeeklyReflectionInput(retrospectives: retrospectives, weekOf: anchorDate))
+                }
+            }
         } else {
             StatisticsEmptyState(title: period.emptyTitle, message: Self.emptyMessage)
                 .padding(.horizontal, 16)
