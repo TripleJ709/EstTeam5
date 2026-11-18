@@ -36,6 +36,7 @@ import SwiftUI
           }
           .padding(Metric.padding)
           .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.chart))
+          .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
           .accessibilityElement(children: .ignore)
           .accessibilityLabel("감정 분포")
           .accessibilityValue(accessibilityValue)
@@ -56,7 +57,7 @@ import SwiftUI
                   .font(.footnote.weight(isHighlighted ? .medium : .regular))
                   .foregroundStyle(isHighlighted ? FeeloColor.textPrimary : FeeloColor.textSecondary)
                   .lineLimit(1)
-                  .minimumScaleFactor(0.8)
+                  .minimumScaleFactor(0.6)
           }
           .frame(maxWidth: .infinity)
           .opacity(isEmpty ? Metric.emptyOpacity : 1)

@@ -104,14 +104,28 @@ struct RetrospectiveListView: View {
                 ForEach(Emotion.allCases) { legendItem($0) }
             }
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .leading), count: 3), spacing: 6) {
-                ForEach(Emotion.allCases) { legendItem($0) }
-            }
+            legendGrid(columns: 3)
+            legendGrid(columns: 2)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)
         .padding(.top, 1)
         .accessibilityHidden(true)
+    }
+
+    // Grid는 열 폭을 내용 크기로 계산하므로 ViewThatFits가 실제로 들어가는 열 수를 고를 수 있다.
+    private func legendGrid(columns: Int) -> some View {
+        let emotions = Emotion.allCases
+        let rows = stride(from: 0, to: emotions.count, by: columns).map {
+            Array(emotions[$0..<min($0 + columns, emotions.count)])
+        }
+        return Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
+            ForEach(rows.indices, id: \.self) { index in
+                GridRow {
+                    ForEach(rows[index]) { legendItem($0) }
+                }
+            }
+        }
     }
 
     private func legendItem(_ emotion: Emotion) -> some View {
@@ -130,7 +144,7 @@ struct RetrospectiveListView: View {
             Text(previewHeader(count: items.count))
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(FeeloColor.textSecondary)
-                .frame(height: 42)
+                .frame(minHeight: 42)
                 .padding(.horizontal, 32)
 
             if items.isEmpty {

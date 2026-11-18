@@ -8,6 +8,9 @@ struct StatisticsView: View {
     @State private var period: Period = .month
     @State private var anchorDate = Date.now
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .title3) private var summaryAuraSize = 20
+
     private var calendar: Calendar { .current }
     private static let locale = Locale(identifier: "ko_KR")
     private static let emptyMessage = "회고를 남기면 감정 흐름과 분포가 채워져요"
@@ -158,6 +161,7 @@ struct StatisticsView: View {
         }
         .padding(.leading, 16)
         .padding(.trailing, 8)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private func navigationButton(systemName: String, label: String, offset: Int) -> some View {
@@ -172,15 +176,21 @@ struct StatisticsView: View {
         .accessibilityLabel(label)
     }
 
+    private var summaryLayout: AnyLayout {
+        typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: 12))
+            : AnyLayout(HStackLayout(spacing: 12))
+    }
+
     private var summaryCards: some View {
-        HStack(spacing: 12) {
+        summaryLayout {
             StatCard(label: period.recordCountLabel) {
                 Text("\(periodRetrospectives.count)건")
             }
             StatCard(label: "가장 많은 감정") {
                 if let top = emotionCounts.first {
                     HStack(spacing: 8) {
-                        EmotionAuraView(emotion: top.emotion, size: 20)
+                        EmotionAuraView(emotion: top.emotion, size: summaryAuraSize)
                         Text("\(top.emotion.displayName) \(top.count)회")
                     }
                 } else {
