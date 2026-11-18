@@ -5,55 +5,20 @@ struct StatisticsView: View {
     @Query(sort: \Retrospective.date)
     private var retrospectives: [Retrospective]
 
-    @State private var period: Period = .month
+    @State private var period: StatisticsPeriod = .month
     @State private var anchorDate = Date.now
+    @State private var weeklyAnalysis = WeeklyAnalysisStore()
 
     @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .title3) private var summaryAuraSize = 20
-
-    private var calendar: Calendar { .current }
-    private static let locale = Locale(identifier: "ko_KR")
     private static let emptyMessage = "회고를 남기면 감정 흐름과 분포가 채워져요"
 
-    enum Period: String, CaseIterable, Identifiable {
-        case week = "주간"
-        case month = "월간"
-        var id: String { rawValue }
+    private var periodItems: [Retrospective] {
+        Retrospective.inPeriod(retrospectives, period, of: anchorDate)
+    }
 
-        var calendarComponent: Calendar.Component {
-            switch self {
-            case .week: .weekOfYear
-            case .month: .month
-            }
-        }
-
-        var recordCountLabel: String {
-            switch self {
-            case .week: "이번 주 기록"
-            case .month: "이번 달 기록"
-            }
-        }
-
-        var emptyTitle: String {
-            switch self {
-            case .week: "이 주에는 기록이 없어요"
-            case .month: "이 달에는 기록이 없어요"
-            }
-        }
-
-        var feedbackTitle: String {
-            switch self {
-            case .week: "이번 주의 한마디"
-            case .month: "이번 달의 한마디"
-            }
-        }
-
-        func feedback(for emotion: Emotion) -> String? {
-            switch self {
-            case .week: emotion.weeklyFeedback
-            case .month: emotion.monthlyFeedback
-            }
-        }
+    private var topEmotion: Emotion? {
+        Retrospective.topEmotion(in: periodItems)
     }
 
     var body: some View {
@@ -61,7 +26,7 @@ struct StatisticsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     Picker("기간", selection: $period) {
-                        ForEach(Period.allCases) { Text($0.rawValue).tag($0) }
+                        ForEach(StatisticsPeriod.allCases) { Text($0.rawValue).tag($0) }
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal, 16)
@@ -76,13 +41,15 @@ struct StatisticsView: View {
             .navigationTitle("감정 돌아보기")
         }
         .tint(FeeloColor.tint)
+        .onChange(of: anchorDate) { weeklyAnalysis.reset() }
+        .onChange(of: period) { weeklyAnalysis.reset() }
     }
 
     private var screenBackground: some View {
         ZStack(alignment: .top) {
             FeeloColor.bgApp
 
-            if let top = emotionCounts.first?.emotion {
+            if let top = topEmotion {
                 EmotionWash(emotion: top, opacity: 0.55, blur: 30)
                     .scaleEffect(1.8)
                     .offset(y: 160)
@@ -94,11 +61,15 @@ struct StatisticsView: View {
 
     @ViewBuilder
     private var content: some View {
-        if let top = emotionCounts.first?.emotion {
+        if let top = topEmotion {
             distributionSection(highlighted: top)
-            if let message = period.feedback(for: top), !message.isEmpty {
-                StatisticsFeedbackCard(emotion: top, title: period.feedbackTitle, message: message)
-                    .padding(.horizontal, 16)
+            StatisticsFeedbackCard(emotion: top, title: period.feedbackTitle, message: period.feedback(for: top))
+                .padding(.horizontal, 16)
+
+            if period == .week {
+                WeeklyAIReportSection(state: weeklyAnalysis.state, accentEmotion: top) {
+                    weeklyAnalysis.analyze(WeeklyReflectionInput(retrospectives: retrospectives, weekOf: anchorDate))
+                }
             }
         } else {
             StatisticsEmptyState(title: period.emptyTitle, message: Self.emptyMessage)
@@ -106,52 +77,9 @@ struct StatisticsView: View {
         }
     }
 
-    private var periodDays: [Date] {
-        guard let interval = calendar.dateInterval(of: period.calendarComponent, for: anchorDate) else { return [] }
-        var result: [Date] = []
-        var cursor = interval.start
-        while cursor < interval.end {
-            result.append(cursor)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
-            cursor = next
-        }
-        return result
-    }
-
-    private var periodRetrospectives: [Retrospective] {
-        retrospectives.filter { calendar.isDate($0.date, equalTo: anchorDate, toGranularity: period.calendarComponent) }
-    }
-
-    private var emotionCounts: [(emotion: Emotion, count: Int)] {
-        let counts = Dictionary(grouping: periodRetrospectives, by: \.emotion).mapValues(\.count)
-        return Emotion.allCases
-            .compactMap { emotion in counts[emotion].map { (emotion, $0) } }
-            .sorted { $0.count > $1.count }
-    }
-
-    private var periodTitle: String {
-        switch period {
-        case .month:
-            return anchorDate.formatted(.dateTime.year().month(.wide).locale(Self.locale))
-        case .week:
-            guard let first = periodDays.first, let last = periodDays.last else { return "" }
-            let startStyle = Date.FormatStyle.dateTime.month().day().locale(Self.locale)
-            let endStyle = calendar.isDate(first, equalTo: last, toGranularity: .month)
-                ? Date.FormatStyle.dateTime.day().locale(Self.locale)
-                : startStyle
-            return "\(first.formatted(startStyle)) – \(last.formatted(endStyle))"
-        }
-    }
-
-    private func moveAnchor(by value: Int) {
-        if let moved = calendar.date(byAdding: period.calendarComponent, value: value, to: anchorDate) {
-            anchorDate = moved
-        }
-    }
-
     private var periodNavigation: some View {
         HStack(spacing: 0) {
-            Text(periodTitle)
+            Text(period.title(of: anchorDate))
                 .font(.title3.weight(.medium))
                 .foregroundStyle(FeeloColor.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -166,7 +94,7 @@ struct StatisticsView: View {
 
     private func navigationButton(systemName: String, label: String, offset: Int) -> some View {
         Button {
-            moveAnchor(by: offset)
+            anchorDate = period.moved(anchorDate, by: offset)
         } label: {
             Image(systemName: systemName)
                 .font(.title3.weight(.medium))
@@ -185,13 +113,13 @@ struct StatisticsView: View {
     private var summaryCards: some View {
         summaryLayout {
             StatCard(label: period.recordCountLabel) {
-                Text("\(periodRetrospectives.count)건")
+                Text("\(periodItems.count)건")
             }
             StatCard(label: "가장 많은 감정") {
-                if let top = emotionCounts.first {
+                if let top = topEmotion {
                     HStack(spacing: 8) {
-                        EmotionAuraView(emotion: top.emotion, size: summaryAuraSize)
-                        Text("\(top.emotion.displayName) \(top.count)회")
+                        EmotionAuraView(emotion: top, size: summaryAuraSize)
+                        Text("\(top.displayName) \(Retrospective.count(of: top, in: periodItems))회")
                     }
                 } else {
                     Text("-")
@@ -201,16 +129,10 @@ struct StatisticsView: View {
         .padding(.horizontal, 16)
     }
 
-    private var emotionDistribution: [(emotion: Emotion, count: Int)] {
-        Emotion.allCases.map { emotion in
-            (emotion, emotionCounts.first { $0.emotion == emotion }?.count ?? 0)
-        }
-    }
-
     private func distributionSection(highlighted: Emotion) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("감정 분포")
-            EmotionBarChart(items: emotionDistribution, highlighted: highlighted)
+            EmotionBarChart(items: Retrospective.emotionCounts(in: periodItems), highlighted: highlighted)
         }
         .padding(.horizontal, 16)
     }
