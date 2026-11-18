@@ -83,6 +83,7 @@ struct RetrospectiveListView: View {
         .padding(.top, 12)
         .padding(.leading, 16)
         .padding(.trailing, 4)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private func monthButton(systemName: String, label: String, offset: Int) -> some View {
@@ -98,15 +99,13 @@ struct RetrospectiveListView: View {
     }
 
     private var legend: some View {
-        HStack(spacing: 10) {
-            ForEach(Emotion.allCases) { emotion in
-                HStack(spacing: 4) {
-                    EmotionAuraView(emotion: emotion, size: 10)
-                    Text(emotion.displayName)
-                        .font(.caption)
-                        .foregroundStyle(FeeloColor.textSecondary)
-                        .fixedSize()
-                }
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                ForEach(Emotion.allCases) { legendItem($0) }
+            }
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .leading), count: 3), spacing: 6) {
+                ForEach(Emotion.allCases) { legendItem($0) }
             }
         }
         .frame(maxWidth: .infinity)
@@ -115,12 +114,21 @@ struct RetrospectiveListView: View {
         .accessibilityHidden(true)
     }
 
+    private func legendItem(_ emotion: Emotion) -> some View {
+        HStack(spacing: 4) {
+            EmotionAuraView(emotion: emotion, size: 10)
+            Text(emotion.displayName)
+                .font(.caption)
+                .foregroundStyle(FeeloColor.textSecondary)
+                .fixedSize()
+        }
+    }
+
     private var selectedDayPreview: some View {
         let items = selectedDayItems
         return VStack(alignment: .leading, spacing: 0) {
             Text(previewHeader(count: items.count))
-                .font(.system(size: 15, weight: .medium))
-                .tracking(-0.23)
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(FeeloColor.textSecondary)
                 .frame(height: 42)
                 .padding(.horizontal, 32)

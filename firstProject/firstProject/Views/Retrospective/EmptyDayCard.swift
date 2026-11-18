@@ -10,33 +10,41 @@ struct EmptyDayCard: View {
     let content: Content
     var onWrite: () -> Void = {}
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .body) private var iconSize = 34
+
+    private var layout: AnyLayout {
+        typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+            : AnyLayout(HStackLayout(spacing: 12))
+    }
+
     var body: some View {
-        HStack(spacing: 12) {
+        layout {
             Circle()
                 .strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                .frame(width: 34, height: 34)
+                .frame(width: iconSize, height: iconSize)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(content.title)
-                    .font(.system(size: 17, weight: .medium))
-                    .tracking(-0.43)
+                    .font(.body.weight(.medium))
                     .foregroundStyle(FeeloColor.textPrimary)
                 Text(content.message)
-                    .font(.system(size: 15))
-                    .tracking(-0.23)
+                    .font(.subheadline)
                     .foregroundStyle(FeeloColor.textSecondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
 
             if let buttonTitle = content.buttonTitle {
                 Button(action: onWrite) {
                     Text(buttonTitle)
-                        .font(.system(size: 15, weight: .medium))
-                        .tracking(-0.23)
+                        .font(.subheadline.weight(.medium))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 16)
-                        .frame(height: 36)
+                        .padding(.vertical, 8)
+                        .frame(minHeight: 36)
                         .background(FeeloColor.tint, in: Capsule())
                 }
                 .fixedSize()
