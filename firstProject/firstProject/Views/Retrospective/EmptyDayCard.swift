@@ -41,7 +41,7 @@ struct EmptyDayCard: View {
                 Button(action: onWrite) {
                     Text(buttonTitle)
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FeeloColor.onTint)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .frame(minHeight: 36)

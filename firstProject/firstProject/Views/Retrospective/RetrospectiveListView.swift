@@ -54,6 +54,7 @@ struct RetrospectiveListView: View {
                         writeRequest = WriteRequest(date: today)
                     } label: {
                         Image(systemName: "plus")
+                            .foregroundStyle(FeeloColor.onTint)
                             .accessibilityLabel("회고 작성")
                     }
                     .buttonStyle(.borderedProminent)

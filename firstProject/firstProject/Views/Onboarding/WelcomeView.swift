@@ -118,7 +118,7 @@ struct WelcomeView: View {
         Button(action: onStart) {
             Text("시작하기")
                 .font(.body.weight(.medium))
-                .foregroundStyle(.white)
+                .foregroundStyle(FeeloColor.onTint)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .frame(minHeight: 52)
