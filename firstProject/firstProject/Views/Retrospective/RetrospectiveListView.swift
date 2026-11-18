@@ -9,6 +9,7 @@ struct RetrospectiveListView: View {
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
     @State private var isShowingThemeAlert = false
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
 
     private var calendar: Calendar { .current }
     private var today: Date { .now }
@@ -62,12 +63,12 @@ struct RetrospectiveListView: View {
             .alert("테마", isPresented: $isShowingThemeAlert) {
                 ForEach(AppTheme.allCases) { theme in
                     Button(theme.title) {
-                        // TODO: 선택한 테마 저장 및 적용
+                        appTheme = theme
                     }
                 }
                 Button("취소", role: .cancel) {}
             } message: {
-                Text("앱의 화면 모드를 선택하세요.")
+                Text("현재 설정: \(appTheme.title)")
             }
             .sheet(item: $writeRequest) { request in
                 NavigationStack {
