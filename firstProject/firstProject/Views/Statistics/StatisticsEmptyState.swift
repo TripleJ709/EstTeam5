@@ -12,7 +12,6 @@ import SwiftUI
      let message: String
  
      private enum Metric {
-         static let iconSize: CGFloat = 56
          static let iconLineWidth: CGFloat = 1.5
          static let iconDash: [CGFloat] = [4, 4]
          static let spacing: CGFloat = 8
@@ -21,7 +20,9 @@ import SwiftUI
          static let bottom: CGFloat = 40
          static let horizontal: CGFloat = 24
      }
- 
+
+     @ScaledMetric(relativeTo: .headline) private var iconSize = 56
+
      var body: some View {
          VStack(spacing: Metric.spacing) {
              Circle()
@@ -29,7 +30,7 @@ import SwiftUI
                      FeeloColor.borderDashed,
                      style: StrokeStyle(lineWidth: Metric.iconLineWidth, dash: Metric.iconDash)
                  )
-                 .frame(width: Metric.iconSize, height: Metric.iconSize)
+                 .frame(width: iconSize, height: iconSize)
                  .accessibilityHidden(true)
  
              Text(title)

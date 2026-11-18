@@ -8,6 +8,8 @@ struct RetrospectiveListView: View {
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
+    @State private var isShowingThemeAlert = false
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
 
     private var calendar: Calendar { .current }
     private var today: Date { .now }
@@ -39,9 +41,11 @@ struct RetrospectiveListView: View {
             .navigationTitle("회고")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {} label: {
-                        Image(systemName: "circle.lefthalf.filled")
-                            .accessibilityLabel("화면 설정")
+                    Button {
+                        isShowingThemeAlert = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .accessibilityLabel("테마 설정")
                     }
                     .tint(FeeloColor.tint)
                 }
@@ -50,11 +54,22 @@ struct RetrospectiveListView: View {
                         writeRequest = WriteRequest(date: today)
                     } label: {
                         Image(systemName: "plus")
+                            .foregroundStyle(FeeloColor.onTint)
                             .accessibilityLabel("회고 작성")
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(FeeloColor.tint)
                 }
+            }
+            .alert("테마", isPresented: $isShowingThemeAlert) {
+                ForEach(AppTheme.allCases) { theme in
+                    Button(theme.title) {
+                        appTheme = theme
+                    }
+                }
+                Button("취소", role: .cancel) {}
+            } message: {
+                Text("현재 설정: \(appTheme.title)")
             }
             .sheet(item: $writeRequest) { request in
                 NavigationStack {
@@ -77,6 +92,7 @@ struct RetrospectiveListView: View {
         .padding(.top, 12)
         .padding(.leading, 16)
         .padding(.trailing, 4)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private func monthButton(systemName: String, label: String, offset: Int) -> some View {
@@ -92,16 +108,13 @@ struct RetrospectiveListView: View {
     }
 
     private var legend: some View {
-        HStack(spacing: 10) {
-            ForEach(Emotion.allCases) { emotion in
-                HStack(spacing: 4) {
-                    EmotionAuraView(emotion: emotion, size: 10)
-                    Text(emotion.displayName)
-                        .font(.caption)
-                        .foregroundStyle(FeeloColor.textSecondary)
-                        .fixedSize()
-                }
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                ForEach(Emotion.allCases) { legendItem($0) }
             }
+
+            legendGrid(columns: 3)
+            legendGrid(columns: 2)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)
@@ -109,14 +122,38 @@ struct RetrospectiveListView: View {
         .accessibilityHidden(true)
     }
 
+    // Grid는 열 폭을 내용 크기로 계산하므로 ViewThatFits가 실제로 들어가는 열 수를 고를 수 있다.
+    private func legendGrid(columns: Int) -> some View {
+        let emotions = Emotion.allCases
+        let rows = stride(from: 0, to: emotions.count, by: columns).map {
+            Array(emotions[$0..<min($0 + columns, emotions.count)])
+        }
+        return Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
+            ForEach(rows.indices, id: \.self) { index in
+                GridRow {
+                    ForEach(rows[index]) { legendItem($0) }
+                }
+            }
+        }
+    }
+
+    private func legendItem(_ emotion: Emotion) -> some View {
+        HStack(spacing: 4) {
+            EmotionAuraView(emotion: emotion, size: 10)
+            Text(emotion.displayName)
+                .font(.caption)
+                .foregroundStyle(FeeloColor.textSecondary)
+                .fixedSize()
+        }
+    }
+
     private var selectedDayPreview: some View {
         let items = selectedDayItems
         return VStack(alignment: .leading, spacing: 0) {
             Text(previewHeader(count: items.count))
-                .font(.system(size: 15, weight: .medium))
-                .tracking(-0.23)
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(FeeloColor.textSecondary)
-                .frame(height: 42)
+                .frame(minHeight: 42)
                 .padding(.horizontal, 32)
 
             if items.isEmpty {

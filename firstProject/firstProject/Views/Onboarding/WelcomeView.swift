@@ -13,20 +13,27 @@ struct WelcomeView: View {
         (.exhausted, 64, 300, 330, 4),
     ]
 
+    @ScaledMetric(relativeTo: .largeTitle) private var logoSize = 52
+
     var body: some View {
-        VStack(spacing: 0) {
-            hero
-                .padding(.top, 34)
+        ScrollView {
+            VStack(spacing: 0) {
+                hero
+                    .padding(.top, 34)
 
-            introText
-                .padding(.top, 25)
-
-            Spacer(minLength: 24)
-
+                introText
+                    .padding(.top, 25)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 24)
+            }
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .safeAreaInset(edge: .bottom) {
             startButton
                 .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+                .background(FeeloColor.bgApp.ignoresSafeArea(edges: .bottom))
         }
-        .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(alignment: .topLeading) { background }
     }
@@ -89,18 +96,18 @@ struct WelcomeView: View {
     private var introText: some View {
         VStack(spacing: 10) {
             Text("Feelo")
-                .font(.system(size: 52, weight: .bold))
+                .font(.system(size: logoSize, weight: .bold))
                 .tracking(-1)
                 .foregroundStyle(FeeloColor.textPrimary)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
 
             Text("오늘의 감정을 색으로 남겨요")
-                .font(.system(size: 22, weight: .bold))
-                .tracking(-0.26)
+                .font(.title2.bold())
                 .foregroundStyle(FeeloColor.textPrimary)
 
             Text("짧게 쓰고 감정을 고르면,\n한 달이 색으로 이어져요.")
-                .font(.system(size: 17))
-                .tracking(-0.43)
+                .font(.body)
                 .lineSpacing(0)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(FeeloColor.textSecondary)
@@ -110,11 +117,11 @@ struct WelcomeView: View {
     private var startButton: some View {
         Button(action: onStart) {
             Text("시작하기")
-                .font(.system(size: 17, weight: .medium))
-                .tracking(-0.43)
-                .foregroundStyle(.white)
+                .font(.body.weight(.medium))
+                .foregroundStyle(FeeloColor.onTint)
                 .frame(maxWidth: .infinity)
-                .frame(height: 52)
+                .padding(.vertical, 14)
+                .frame(minHeight: 52)
                 .background(FeeloColor.tint, in: Capsule())
         }
     }

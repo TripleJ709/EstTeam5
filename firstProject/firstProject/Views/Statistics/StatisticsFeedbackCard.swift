@@ -13,15 +13,23 @@ import SwiftUI
      let message: String
  
      private enum Metric {
-         static let auraSize: CGFloat = 40
          static let spacing: CGFloat = 12
          static let textSpacing: CGFloat = 2
          static let padding: CGFloat = 16
      }
- 
+
+     @Environment(\.dynamicTypeSize) private var typeSize
+     @ScaledMetric(relativeTo: .subheadline) private var auraSize = 40
+
+     private var layout: AnyLayout {
+         typeSize.isAccessibilitySize
+             ? AnyLayout(VStackLayout(alignment: .leading, spacing: Metric.spacing))
+             : AnyLayout(HStackLayout(spacing: Metric.spacing))
+     }
+
      var body: some View {
-         HStack(spacing: Metric.spacing) {
-             EmotionAuraView(emotion: emotion, size: Metric.auraSize)
+         layout {
+             EmotionAuraView(emotion: emotion, size: auraSize)
  
              VStack(alignment: .leading, spacing: Metric.textSpacing) {
                  Text(title)

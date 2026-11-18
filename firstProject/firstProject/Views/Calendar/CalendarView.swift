@@ -36,6 +36,7 @@ struct CalendarView: View {
         .padding(.horizontal, 11)
         .padding(.vertical, 10)
         .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.calendar))
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private var weekdayHeader: some View {
@@ -45,8 +46,7 @@ struct CalendarView: View {
         return LazyVGrid(columns: columns, spacing: 0) {
             ForEach(ordered.indices, id: \.self) { index in
                 Text(ordered[index])
-                    .font(.system(size: 13, weight: .medium))
-                    .tracking(-0.08)
+                    .font(.footnote.weight(.medium))
                     .foregroundStyle(FeeloColor.textSecondary)
                     .frame(height: 20)
             }
@@ -100,21 +100,23 @@ private struct DayCell: View {
     let marker: Marker
     let action: () -> Void
 
+    @ScaledMetric(relativeTo: .body) private var cellHeight = 72
+    @ScaledMetric(relativeTo: .body) private var markerSize = 34
+
     private var isEmphasized: Bool { isSelected || isToday }
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Text("\(day)")
-                    .font(.system(size: isEmphasized ? 17 : 16, weight: isEmphasized ? .medium : .regular))
-                    .tracking(isEmphasized ? -0.43 : -0.31)
+                    .font(isEmphasized ? .body.weight(.medium) : .callout)
                     .foregroundStyle(isEmphasized ? FeeloColor.tint : FeeloColor.textPrimary)
                     .opacity(isOutside ? 0.35 : 1)
                 markerView
             }
             .padding(.bottom, 6)
             .frame(maxWidth: .infinity)
-            .frame(height: 72)
+            .frame(height: cellHeight)
             .background(
                 isSelected && !isOutside ? FeeloColor.bgSelected : .clear,
                 in: RoundedRectangle(cornerRadius: FeeloRadius.cell)
@@ -130,13 +132,13 @@ private struct DayCell: View {
     private var markerView: some View {
         switch marker {
         case .emotion(let emotion):
-            EmotionAuraView(emotion: emotion, size: 34)
+            EmotionAuraView(emotion: emotion, size: markerSize)
         case .missed:
             Circle()
                 .strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                .frame(width: 34, height: 34)
+                .frame(width: markerSize, height: markerSize)
         case .none:
-            Color.clear.frame(width: 34, height: 34)
+            Color.clear.frame(width: markerSize, height: markerSize)
         }
     }
 
