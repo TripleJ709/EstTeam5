@@ -31,7 +31,7 @@ struct WeeklyAIReportSection: View {
 
             Spacer()
 
-            if case .loaded = state {
+            if state.isLoaded {
                 Button(action: onAnalyze) {
                     Label("다시 분석", systemImage: "arrow.clockwise")
                         .font(.caption.weight(.medium))

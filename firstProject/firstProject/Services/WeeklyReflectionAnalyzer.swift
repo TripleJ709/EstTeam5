@@ -60,11 +60,17 @@ struct WeeklyReflectionAnalyzer {
     }
 
     private static var schema: [String: Any] {
-        let keys = ["facts", "emotional_flow", "positives", "regrets", "solutions", "summary"]
-        return [
+        [
             "type": "object",
-            "properties": Dictionary(uniqueKeysWithValues: keys.map { ($0, ["type": "string"]) }),
-            "required": keys,
+            "properties": [
+                "facts": ["type": "string"],
+                "emotional_flow": ["type": "string"],
+                "positives": ["type": "string"],
+                "regrets": ["type": "string"],
+                "solutions": ["type": "string"],
+                "summary": ["type": "string"]
+            ],
+            "required": ["facts", "emotional_flow", "positives", "regrets", "solutions", "summary"],
             "additionalProperties": false
         ]
     }

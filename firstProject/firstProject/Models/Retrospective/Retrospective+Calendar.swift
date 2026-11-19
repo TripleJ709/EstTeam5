@@ -2,13 +2,29 @@ import Foundation
 
 extension Retrospective {
     static func latest(in items: [Retrospective], on date: Date, calendar: Calendar = .current) -> Retrospective? {
-        items.filter { calendar.isDate($0.date, inSameDayAs: date) }.max { $0.createdAt < $1.createdAt }
+        let sameDayItems = items.filter { calendar.isDate($0.date, inSameDayAs: date) }
+        guard var latest = sameDayItems.first else { return nil }
+
+        for item in sameDayItems {
+            if item.createdAt > latest.createdAt {
+                latest = item
+            }
+        }
+        return latest
     }
 
     static func topEmotion(in items: [Retrospective]) -> Emotion? {
-        guard !items.isEmpty else { return nil }
-        let counts = Dictionary(grouping: items, by: \.emotion).mapValues(\.count)
-        return Emotion.allCases.max { (counts[$0] ?? 0) < (counts[$1] ?? 0) }
+        var top: Emotion?
+        var topCount = 0
+
+        for emotion in Emotion.allCases {
+            let count = Retrospective.count(of: emotion, in: items)
+            if count > topCount {
+                top = emotion
+                topCount = count
+            }
+        }
+        return top
     }
 
     static func monthSummary(of items: [Retrospective], month: Date, calendar: Calendar = .current) -> String {

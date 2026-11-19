@@ -33,7 +33,7 @@ struct EmotionRecommender {
         [
             "type": "object",
             "properties": [
-                "emotion": ["type": "string", "enum": Emotion.allCases.map(\.rawValue)]
+                "emotion": ["type": "string", "enum": Emotion.allCases.map { $0.rawValue }]
             ],
             "required": ["emotion"],
             "additionalProperties": false

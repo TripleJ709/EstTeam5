@@ -14,13 +14,22 @@ struct RetrospectiveWriteView: View {
 
     private let recommender = EmotionRecommender()
     private var gridColumns: [GridItem] {
-        let count = typeSize.isAccessibilitySize ? 2 : (typeSize >= .xxLarge ? 3 : 4)
+        var count = 4
+        if typeSize.isAccessibilitySize {
+            count = 2
+        } else if typeSize >= .xxLarge {
+            count = 3
+        }
         return Array(repeating: GridItem(.flexible(), spacing: 8), count: count)
     }
 
     init(retrospective: Retrospective? = nil, date: Date? = nil) {
         self.retrospective = retrospective
-        _draft = State(initialValue: retrospective.map { RetrospectiveDraft($0) } ?? RetrospectiveDraft(date: date ?? .now))
+        if let retrospective {
+            _draft = State(initialValue: RetrospectiveDraft(retrospective))
+        } else {
+            _draft = State(initialValue: RetrospectiveDraft(date: date ?? .now))
+        }
     }
 
     var body: some View {
@@ -180,9 +189,14 @@ struct RetrospectiveWriteView: View {
     @ViewBuilder
     private var recommendationNote: some View {
         switch recommendation {
-        case .recommended(let emotion) where draft.emotion == emotion:
-            Text("AI가 \(emotion.displayName) 감정을 추천했어요. 위에서 직접 바꿀 수도 있어요.")
-                .foregroundStyle(FeeloColor.textSecondary)
+        case .recommended(let emotion):
+            if draft.emotion == emotion {
+                Text("AI가 \(emotion.displayName) 감정을 추천했어요. 위에서 직접 바꿀 수도 있어요.")
+                    .foregroundStyle(FeeloColor.textSecondary)
+            } else {
+                Text("")
+                    .foregroundStyle(FeeloColor.textSecondary)
+            }
         case .failed(let message):
             Text(message)
                 .foregroundStyle(FeeloColor.destructive)
@@ -210,9 +224,10 @@ struct RetrospectiveWriteView: View {
                 recommendation = .recommended(emotion)
             } catch is CancellationError {
                 recommendation = .idle
+            } catch let error as OpenAIError {
+                recommendation = .failed(error.userMessage(for: EmotionRecommender.feature))
             } catch {
-                let known = error as? OpenAIError ?? .invalidResponse
-                recommendation = .failed(known.userMessage(for: EmotionRecommender.feature))
+                recommendation = .failed(OpenAIError.invalidResponse.userMessage(for: EmotionRecommender.feature))
             }
         }
     }

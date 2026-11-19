@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EmotionBarChart: View {
-    let items: [(emotion: Emotion, count: Int)]
+    let items: [EmotionCount]
     let highlighted: Emotion?
 
     private enum Metric {
@@ -17,12 +17,18 @@ struct EmotionBarChart: View {
     }
 
     private var maxCount: Int {
-        max(items.map(\.count).max() ?? 0, 1)
+        var result = 1
+        for item in items {
+            if item.count > result {
+                result = item.count
+            }
+        }
+        return result
     }
 
     var body: some View {
         HStack(alignment: .bottom, spacing: Metric.columnSpacing) {
-            ForEach(items, id: \.emotion) { item in
+            ForEach(items) { item in
                 column(emotion: item.emotion, count: item.count)
             }
         }
@@ -76,7 +82,15 @@ struct EmotionBarChart: View {
 
 #Preview {
     EmotionBarChart(
-        items: [(.joy, 1), (.achievement, 2), (.stable, 1), (.angry, 0), (.fear, 0), (.sad, 1), (.exhausted, 0)],
+        items: [
+            EmotionCount(emotion: .joy, count: 1),
+            EmotionCount(emotion: .achievement, count: 2),
+            EmotionCount(emotion: .stable, count: 1),
+            EmotionCount(emotion: .angry, count: 0),
+            EmotionCount(emotion: .fear, count: 0),
+            EmotionCount(emotion: .sad, count: 1),
+            EmotionCount(emotion: .exhausted, count: 0)
+        ],
         highlighted: .achievement
     )
     .padding(16)

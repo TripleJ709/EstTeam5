@@ -122,12 +122,20 @@ struct RetrospectiveListView: View {
         .accessibilityHidden(true)
     }
 
-    // Grid는 열 폭을 내용 크기로 계산하므로 ViewThatFits가 실제로 들어가는 열 수를 고를 수 있다.
     private func legendGrid(columns: Int) -> some View {
-        let emotions = Emotion.allCases
-        let rows = stride(from: 0, to: emotions.count, by: columns).map {
-            Array(emotions[$0..<min($0 + columns, emotions.count)])
+        var rows: [[Emotion]] = []
+        var currentRow: [Emotion] = []
+        for emotion in Emotion.allCases {
+            currentRow.append(emotion)
+            if currentRow.count == columns {
+                rows.append(currentRow)
+                currentRow = []
+            }
         }
+        if !currentRow.isEmpty {
+            rows.append(currentRow)
+        }
+
         return Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
             ForEach(rows.indices, id: \.self) { index in
                 GridRow {

@@ -3,14 +3,14 @@ import SwiftUI
 struct WelcomeView: View {
     let onStart: () -> Void
 
-    private let auras: [(emotion: Emotion, size: CGFloat, x: CGFloat, y: CGFloat, blur: CGFloat)] = [
-        (.joy, 150, 150, 70, 2),
-        (.achievement, 104, 40, 40, 1),
-        (.stable, 100, 270, 30, 0.5),
-        (.sad, 130, 250, 190, 1),
-        (.fear, 120, 30, 190, 1.5),
-        (.angry, 96, 149, 270, 3),
-        (.exhausted, 64, 300, 330, 4),
+    private let auras: [HeroAura] = [
+        HeroAura(emotion: .joy, size: 150, x: 150, y: 70, blur: 2),
+        HeroAura(emotion: .achievement, size: 104, x: 40, y: 40, blur: 1),
+        HeroAura(emotion: .stable, size: 100, x: 270, y: 30, blur: 0.5),
+        HeroAura(emotion: .sad, size: 130, x: 250, y: 190, blur: 1),
+        HeroAura(emotion: .fear, size: 120, x: 30, y: 190, blur: 1.5),
+        HeroAura(emotion: .angry, size: 96, x: 149, y: 270, blur: 3),
+        HeroAura(emotion: .exhausted, size: 64, x: 300, y: 330, blur: 4)
     ]
 
     @ScaledMetric(relativeTo: .largeTitle) private var logoSize = 52
@@ -62,8 +62,7 @@ struct WelcomeView: View {
 
     private var hero: some View {
         ZStack(alignment: .topLeading) {
-            ForEach(auras.indices, id: \.self) { index in
-                let aura = auras[index]
+            ForEach(auras) { aura in
                 heroOrb(aura.emotion, size: aura.size, blur: aura.blur)
                     .offset(x: aura.x, y: aura.y)
             }
@@ -125,6 +124,16 @@ struct WelcomeView: View {
                 .background(FeeloColor.tint, in: Capsule())
         }
     }
+}
+
+private struct HeroAura: Identifiable {
+    let emotion: Emotion
+    let size: CGFloat
+    let x: CGFloat
+    let y: CGFloat
+    let blur: CGFloat
+
+    var id: Emotion { emotion }
 }
 
 #Preview {
