@@ -3,11 +3,23 @@ import SwiftUI
 struct EmotionAuraView: View {
     let emotion: Emotion
     var size: CGFloat = 28
+    var showsFace: Bool = true
+
+    private let glowScale: CGFloat = 1.3
+
+    private var imageName: String {
+        if showsFace {
+            return "\(emotion.rawValue)Aura"
+        } else {
+            return "\(emotion.rawValue)AuraExpressionless"
+        }
+    }
 
     var body: some View {
-        Image("\(emotion.rawValue)Aura")
+        Image(imageName)
             .resizable()
             .scaledToFit()
+            .frame(width: size * glowScale, height: size * glowScale)
             .frame(width: size, height: size)
             .accessibilityHidden(true)
     }
