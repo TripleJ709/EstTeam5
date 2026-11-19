@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 enum Emotion: String, CaseIterable, Identifiable {
     case joy
@@ -22,30 +22,6 @@ enum Emotion: String, CaseIterable, Identifiable {
         case .fear: return "두려움"
         case .sad: return "슬픔"
         case .exhausted: return "소진"
-        }
-    }
-
-    var emoji: String {
-        switch self {
-        case .joy: return "😊"
-        case .achievement: return "🏆"
-        case .stable: return "😌"
-        case .angry: return "😠"
-        case .fear: return "😨"
-        case .sad: return "😢"
-        case .exhausted: return "😮‍💨"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .joy: return .yellow
-        case .achievement: return .orange
-        case .stable: return .green
-        case .angry: return .red
-        case .fear: return .purple
-        case .sad: return .blue
-        case .exhausted: return .gray
         }
     }
 }

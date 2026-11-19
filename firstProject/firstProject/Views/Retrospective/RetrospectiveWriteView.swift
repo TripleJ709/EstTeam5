@@ -185,7 +185,7 @@ struct RetrospectiveWriteView: View {
                 .foregroundStyle(FeeloColor.textSecondary)
         case .failed(let message):
             Text(message)
-                .foregroundStyle(.red)
+                .foregroundStyle(FeeloColor.destructive)
         default:
             Text("")
                 .foregroundStyle(FeeloColor.textSecondary)
