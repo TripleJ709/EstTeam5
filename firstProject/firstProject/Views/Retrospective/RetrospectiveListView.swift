@@ -147,7 +147,7 @@ struct RetrospectiveListView: View {
 
     private func legendItem(_ emotion: Emotion) -> some View {
         HStack(spacing: 4) {
-            EmotionAuraView(emotion: emotion, size: 10)
+            EmotionAuraView(emotion: emotion, size: 10, showsFace: false)
             Text(emotion.displayName)
                 .font(.caption)
                 .foregroundStyle(Color.textSecondary)
