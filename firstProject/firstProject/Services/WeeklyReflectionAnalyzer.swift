@@ -1,14 +1,29 @@
 import Foundation
 
+/// 한 주의 회고를 분석해 6가지 항목으로 정리하는 서비스입니다.
+///
+/// `OpenAIClient`로 요청을 보내 `WeeklyReflectionAnalysis`를 받아 옵니다.
 struct WeeklyReflectionAnalyzer {
+    /// 오류 메시지(`OpenAIError.userMessage(for:)`)에 사용하는 기능 이름입니다.
     static let feature = "분석"
 
+    /// OpenAI 요청을 보내는 클라이언트입니다.
     private let client: OpenAIClient
 
+    /// 분석 서비스를 생성합니다.
+    ///
+    /// - Parameter client: 요청에 사용할 클라이언트입니다. 기본값은 `OpenAIClient()`입니다.
     init(client: OpenAIClient = OpenAIClient()) {
         self.client = client
     }
 
+    /// 주간 회고 입력을 분석한 결과를 반환합니다.
+    ///
+    /// 타임아웃 30초로 요청을 보냅니다.
+    ///
+    /// - Parameter input: 분석할 주간 회고 입력입니다.
+    /// - Returns: 분석 결과입니다.
+    /// - Throws: 요청이나 응답 처리에 실패하면 `OpenAIError`를 던집니다. 요청이 취소되면 `CancellationError`를 던집니다.
     func analyze(_ input: WeeklyReflectionInput) async throws -> WeeklyReflectionAnalysis {
         try await client.send(
             system: Self.systemPrompt,
@@ -19,6 +34,12 @@ struct WeeklyReflectionAnalyzer {
         )
     }
 
+    /// 주간 회고 입력을 요청에 보낼 사용자 메시지 문자열로 변환합니다.
+    ///
+    /// 기간, 기록 건수와 일수, 가장 많이 선택한 감정, 감정별 횟수, 요일별 감정 흐름, 회고 기록 본문을 순서대로 담습니다.
+    ///
+    /// - Parameter input: 변환할 주간 회고 입력입니다.
+    /// - Returns: 줄바꿈으로 이어 붙인 메시지 문자열입니다.
     private static func makeUserContent(from input: WeeklyReflectionInput) -> String {
         let weekdayStyle = Date.FormatStyle.dateTime.weekday(.abbreviated).locale(.korean)
         let dateStyle = Date.FormatStyle.dateTime.month().day().weekday(.abbreviated).locale(.korean)
@@ -45,6 +66,7 @@ struct WeeklyReflectionAnalyzer {
         return lines.joined(separator: "\n")
     }
 
+    /// 분석 방식과 작성 규칙을 담은 시스템 프롬프트입니다.
     private static var systemPrompt: String {
         """
         사용자가 한 주 동안 쓴 회고를 읽고, 6가지 사고 모델로 한국어로 다정하고 명료하게 정리한다.
@@ -59,6 +81,7 @@ struct WeeklyReflectionAnalyzer {
         """
     }
 
+    /// 응답 형식을 지정하는 JSON 스키마입니다. `facts`, `emotional_flow`, `positives`, `regrets`, `solutions`, `summary`가 모두 문자열로 필요합니다.
     private static var schema: [String: Any] {
         [
             "type": "object",

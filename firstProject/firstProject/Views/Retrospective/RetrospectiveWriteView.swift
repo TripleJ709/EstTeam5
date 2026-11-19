@@ -1,18 +1,30 @@
 import SwiftData
 import SwiftUI
 
+/// 회고를 새로 작성하거나 기존 회고를 편집하는 화면입니다.
+///
+/// 날짜, 감정, 회고 내용을 입력받고, 내용을 바탕으로 한 AI 감정 추천을 받을 수 있습니다.
 struct RetrospectiveWriteView: View {
+    /// 편집할 회고입니다. `nil`이면 새 회고를 작성합니다.
     var retrospective: Retrospective?
 
+    /// 회고를 저장할 때 사용하는 SwiftData 모델 컨텍스트입니다.
     @Environment(\.modelContext) private var modelContext
+    /// 현재 화면을 닫는 동작입니다.
     @Environment(\.dismiss) private var dismiss
+    /// 현재 Dynamic Type(글자 크기) 설정입니다.
     @Environment(\.dynamicTypeSize) private var typeSize
 
+    /// 입력 중인 날짜, 감정, 내용을 담은 초안입니다.
     @State private var draft: RetrospectiveDraft
+    /// AI 감정 추천의 진행 상태입니다.
     @State private var recommendation: RecommendationState = .idle
+    /// 진행 중인 AI 감정 추천 작업입니다. 화면이 사라질 때 취소합니다.
     @State private var recommendTask: Task<Void, Never>?
 
+    /// AI 감정 추천을 요청하는 객체입니다.
     private let recommender = EmotionRecommender()
+    /// 감정 선택 격자의 열 구성입니다. 기본 4열이고, 글자 크기가 `.xxLarge` 이상이면 3열, 접근성 크기이면 2열입니다.
     private var gridColumns: [GridItem] {
         var count = 4
         if typeSize.isAccessibilitySize {
@@ -23,6 +35,13 @@ struct RetrospectiveWriteView: View {
         return Array(repeating: GridItem(.flexible(), spacing: 8), count: count)
     }
 
+    /// 작성 화면을 초기화합니다.
+    ///
+    /// `retrospective`가 있으면 그 값으로 초안을 만들고, 없으면 `date`(없으면 현재 시각)로 빈 초안을 만듭니다.
+    ///
+    /// - Parameters:
+    ///   - retrospective: 편집할 회고입니다. 새로 작성하면 `nil`입니다.
+    ///   - date: 새 회고의 기본 날짜입니다. `nil`이면 현재 시각을 사용합니다.
     init(retrospective: Retrospective? = nil, date: Date? = nil) {
         self.retrospective = retrospective
         if let retrospective {
@@ -32,6 +51,7 @@ struct RetrospectiveWriteView: View {
         }
     }
 
+    /// 화면 구성
     var body: some View {
         ZStack(alignment: .top) {
             Color.bgApp.ignoresSafeArea()
@@ -84,6 +104,7 @@ struct RetrospectiveWriteView: View {
         .presentationBackground(Color.bgApp)
     }
 
+    /// 회고 날짜를 선택하는 영역입니다. 접근성 크기에서는 세로로, 그 외에는 가로로 배치합니다.
     private var dateSection: some View {
         let layout = typeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
@@ -106,12 +127,14 @@ struct RetrospectiveWriteView: View {
         .padding(.top, 8)
     }
 
+    /// 오늘까지만 선택할 수 있는 날짜 선택기입니다.
     private var datePicker: some View {
         DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
             .labelsHidden()
             .environment(\.locale, .korean)
     }
 
+    /// 감정을 고르는 카드 격자와 안내 문구를 보여주는 영역입니다.
     private var emotionSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             sectionTitle("오늘의 감정")
@@ -134,6 +157,7 @@ struct RetrospectiveWriteView: View {
         }
     }
 
+    /// 회고 내용을 입력하는 텍스트 편집기와 글자 수 표시를 보여주는 영역입니다.
     private var contentSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             sectionTitle("회고")
@@ -159,6 +183,7 @@ struct RetrospectiveWriteView: View {
         }
     }
 
+    /// AI 감정 추천 버튼과 추천 결과 안내를 보여주는 영역입니다.
     private var recommendSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button {
@@ -186,6 +211,9 @@ struct RetrospectiveWriteView: View {
         .animation(.easeInOut(duration: 0.2), value: draft.emotion)
     }
 
+    /// AI 추천 결과 또는 오류 메시지를 보여줍니다.
+    ///
+    /// 추천 결과는 현재 선택한 감정과 같을 때만 표시하고, 실패하면 오류 메시지를 표시합니다. 그 외 상태에서는 아무것도 표시하지 않습니다.
     @ViewBuilder
     private var recommendationNote: some View {
         switch recommendation {
@@ -230,6 +258,10 @@ struct RetrospectiveWriteView: View {
         }
     }
 
+    /// 섹션 제목 텍스트를 만듭니다.
+    ///
+    /// - Parameter title: 표시할 제목입니다.
+    /// - Returns: 제목 뷰입니다.
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.subheadline.weight(.medium))
@@ -237,6 +269,9 @@ struct RetrospectiveWriteView: View {
             .padding(.horizontal, 16)
     }
 
+    /// 회고 내용을 바탕으로 AI 감정 추천을 요청합니다.
+    ///
+    /// 내용이 비어 있거나 이미 로딩 중이면 아무 작업도 하지 않습니다. 성공하면 추천된 감정을 초안에 반영하고, 취소되면 대기 상태로 돌아가며, 실패하면 오류 메시지를 저장합니다.
     private func recommend() {
         guard draft.canRecommend, recommendation != .loading else { return }
         let content = draft.trimmedContent
@@ -256,6 +291,9 @@ struct RetrospectiveWriteView: View {
         }
     }
 
+    /// 초안을 저장하고 화면을 닫습니다.
+    ///
+    /// 감정이 선택되지 않았으면 아무 작업도 하지 않습니다. 편집 중이면 기존 회고의 날짜(시각 유지), 내용, 감정을 갱신하고, 새 작성이면 회고를 만들어 삽입합니다.
     private func save() {
         guard let emotion = draft.emotion else { return }
 
@@ -275,18 +313,28 @@ struct RetrospectiveWriteView: View {
     }
 }
 
+/// AI 감정 추천의 진행 상태입니다.
 private enum RecommendationState: Equatable {
+    /// 추천을 요청하지 않은 대기 상태입니다.
     case idle
+    /// 추천 결과를 기다리는 중입니다.
     case loading
+    /// 추천이 완료되었으며 결과를 담고 있습니다.
     case recommended(EmotionRecommendation)
+    /// 추천이 실패했으며 사용자에게 보여줄 오류 메시지를 담고 있습니다.
     case failed(String)
 }
 
+/// 감정 하나를 선택하는 카드입니다.
 private struct EmotionPickerCard: View {
+    /// 카드가 나타내는 감정입니다.
     let emotion: Emotion
+    /// 현재 선택된 상태인지 여부입니다.
     let isSelected: Bool
+    /// 카드를 눌렀을 때 실행할 동작입니다.
     let action: () -> Void
 
+    /// 화면 구성
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {

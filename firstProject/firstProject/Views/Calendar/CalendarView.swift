@@ -1,20 +1,29 @@
 import SwiftUI
 
+/// 월간 달력을 표시하고 날짜를 선택하는 뷰입니다.
 struct CalendarView: View {
+    /// 표시할 달에 속한 날짜입니다.
     let month: Date
+    /// 마커 계산에 사용하는 회고 목록입니다.
     let retrospectives: [Retrospective]
+    /// 선택된 날짜입니다. 날짜를 누르면 갱신됩니다.
     @Binding var selectedDate: Date
+    /// 오늘로 간주할 날짜입니다. 기본값은 현재 시각입니다.
     var today: Date = .now
+    /// 앱 설치 날짜입니다. 기본값은 `AppConfig.installDate`입니다.
     var installDate: Date = AppConfig.installDate
 
+    /// 한국어 로케일을 적용한 `Calendar`입니다.
     private var calendar: Calendar {
         var calendar = Calendar.current
         calendar.locale = .korean
         return calendar
     }
 
+    /// 7개의 유연한 열로 구성된 그리드 설정입니다.
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
 
+    /// 화면 구성
     var body: some View {
         VStack(spacing: 8) {
             weekdayHeader
@@ -39,6 +48,7 @@ struct CalendarView: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
+    /// 요일 머리글 행입니다. 달력의 `firstWeekday`에 맞춰 순서를 정렬합니다.
     private var weekdayHeader: some View {
         let symbols = calendar.veryShortStandaloneWeekdaySymbols
         let first = calendar.firstWeekday - 1
@@ -54,6 +64,7 @@ struct CalendarView: View {
         .accessibilityHidden(true)
     }
 
+    /// 표시할 달이 포함된 첫 주의 시작부터 마지막 주의 끝까지의 날짜 목록입니다. 계산에 실패하면 빈 배열입니다.
     private var days: [Date] {
         guard let monthInterval = calendar.dateInterval(of: .month, for: month),
               let firstWeek = calendar.dateInterval(of: .weekOfMonth, for: monthInterval.start),
@@ -64,6 +75,12 @@ struct CalendarView: View {
         return calendar.days(in: DateInterval(start: firstWeek.start, end: lastWeek.end))
     }
 
+    /// 날짜에 표시할 마커를 결정합니다.
+    ///
+    /// 표시 중인 달이 아니면 `none`, 해당 날짜에 회고가 있으면 가장 최근에 작성한 회고의 감정, 오늘 이전이고 설치 날짜 이후이면 `missed`, 그 외에는 `none`입니다.
+    ///
+    /// - Parameter date: 마커를 결정할 날짜입니다.
+    /// - Returns: 날짜에 표시할 마커입니다.
     private func marker(for date: Date) -> DayCell.Marker {
         guard calendar.isDate(date, equalTo: month, toGranularity: .month) else { return .none }
         if let latest = Retrospective.latest(in: retrospectives, on: date, calendar: calendar) {
@@ -77,22 +94,35 @@ struct CalendarView: View {
     }
 }
 
+/// 달력의 날짜 칸 하나를 그리는 뷰입니다.
 private struct DayCell: View {
+    /// 날짜 칸에 표시되는 마커 종류입니다.
     enum Marker: Equatable { case none, missed, emotion(Emotion) }
 
+    /// 칸이 나타내는 날짜입니다.
     let date: Date
+    /// 날짜의 일(day) 숫자입니다.
     let day: Int
+    /// 표시 중인 달 밖의 날짜인지 여부입니다. `true`이면 비활성화되고 흐리게 표시됩니다.
     let isOutside: Bool
+    /// 선택된 날짜인지 여부입니다.
     let isSelected: Bool
+    /// 오늘인지 여부입니다.
     let isToday: Bool
+    /// 칸에 표시할 마커입니다.
     let marker: Marker
+    /// 칸을 눌렀을 때 호출되는 동작입니다.
     let action: () -> Void
 
+    /// 칸의 높이이며 글자 크기 설정에 따라 조정됩니다.
     @ScaledMetric(relativeTo: .body) private var cellHeight = 72
+    /// 마커의 크기이며 글자 크기 설정에 따라 조정됩니다.
     @ScaledMetric(relativeTo: .body) private var markerSize = 34
 
+    /// 선택되었거나 오늘인 날짜인지 여부입니다.
     private var isEmphasized: Bool { isSelected || isToday }
 
+    /// 화면 구성
     var body: some View {
         Button(action: action) {
             VStack(spacing: 4) {
@@ -116,6 +146,7 @@ private struct DayCell: View {
         .accessibilityLabel(accessibilityText)
     }
 
+    /// 마커 종류에 따라 감정 오라, 점선 원, 빈 공간 중 하나를 그립니다.
     @ViewBuilder
     private var markerView: some View {
         switch marker {
@@ -130,6 +161,7 @@ private struct DayCell: View {
         }
     }
 
+    /// 날짜, 오늘 여부, 감정 이름 또는 기록 없음을 조합한 접근성 레이블입니다.
     private var accessibilityText: String {
         let dateText = (isToday ? "오늘, " : "")
             + date.formatted(.dateTime.month().day().locale(.korean))
