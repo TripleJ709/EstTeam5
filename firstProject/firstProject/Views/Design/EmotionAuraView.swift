@@ -5,28 +5,11 @@ struct EmotionAuraView: View {
     var size: CGFloat = 28
 
     var body: some View {
-        ZStack {
-            orb
-                .opacity(0.5)
-                .blur(radius: size * 3 / 40)
-            orb
-                .offset(y: -size * 3 / 40)
-        }
-        .frame(width: size, height: size)
-        .accessibilityHidden(true)
-    }
-
-    private var orb: some View {
-        Circle()
-            .fill(
-                RadialGradient(
-                    colors: [emotion.auraStart, emotion.auraEnd],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: size / 2
-                )
-            )
+        Image("\(emotion.rawValue)Aura")
+            .resizable()
+            .scaledToFit()
             .frame(width: size, height: size)
+            .accessibilityHidden(true)
     }
 }
 
