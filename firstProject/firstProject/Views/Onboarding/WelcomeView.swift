@@ -3,27 +3,28 @@ import SwiftUI
 struct WelcomeView: View {
     let onStart: () -> Void
 
+    // Figma(402×341) 기준 좌표. frame은 글로우 여백(×1.3)을 포함한 크기.
     private let auras: [HeroAura] = [
-        HeroAura(emotion: .joy, size: 150, x: 150, y: 70, blur: 2),
-        HeroAura(emotion: .achievement, size: 104, x: 40, y: 40, blur: 1),
-        HeroAura(emotion: .stable, size: 100, x: 270, y: 30, blur: 0.5),
-        HeroAura(emotion: .sad, size: 130, x: 250, y: 190, blur: 1),
-        HeroAura(emotion: .fear, size: 120, x: 30, y: 190, blur: 1.5),
-        HeroAura(emotion: .angry, size: 96, x: 149, y: 270, blur: 3),
-        HeroAura(emotion: .exhausted, size: 64, x: 300, y: 330, blur: 4)
+        HeroAura(emotion: .joy, x: 139.28, y: 59.25, frame: 177.049),
+        HeroAura(emotion: .achievement, x: 57.57, y: 43.82, frame: 108.953),
+        HeroAura(emotion: .stable, x: 302.71, y: 100.11, frame: 78.083),
+        HeroAura(emotion: .sad, x: 122.49, y: 200.44, frame: 96.242),
+        HeroAura(emotion: .fear, x: 21.25, y: 138.24, frame: 123.48),
+        HeroAura(emotion: .angry, x: 268.66, y: 162.31, frame: 112.585),
+        HeroAura(emotion: .exhausted, x: 213.28, y: 216.78, frame: 72.636)
     ]
 
-    @ScaledMetric(relativeTo: .largeTitle) private var logoSize = 52
+    private let glowScale: CGFloat = 1.3
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                hero
-                    .padding(.top, 34)
-
                 introText
-                    .padding(.top, 22)
+                    .padding(.top, 94)
                     .padding(.horizontal, 24)
+
+                hero
+                    .padding(.top, 102)
                     .padding(.bottom, 24)
             }
         }
@@ -63,31 +64,46 @@ struct WelcomeView: View {
     private var hero: some View {
         ZStack(alignment: .topLeading) {
             ForEach(auras) { aura in
-                EmotionAuraView(emotion: aura.emotion, size: aura.size)
-                    .blur(radius: aura.blur)
-                    .offset(x: aura.x, y: aura.y)
+                let size = aura.frame / glowScale
+                let inset = (aura.frame - size) / 2
+
+                EmotionAuraView(emotion: aura.emotion, size: size)
+                    .offset(x: aura.x + inset, y: aura.y + inset)
             }
+
+            Image("questionMark")
+                .resizable()
+                .frame(width: 29.087, height: 47.71)
+                .foregroundStyle(Color.textPrimary)
+                .offset(x: 124.72, y: 145.64)
+
+            Image("exclamationMark")
+                .resizable()
+                .frame(width: 14.208, height: 61.275)
+                .foregroundStyle(Color.textPrimary)
+                .offset(x: 293.63, y: 57.44)
         }
-        .frame(width: 402, height: 430, alignment: .topLeading)
+        .frame(width: 402, height: 341, alignment: .topLeading)
         .frame(maxWidth: .infinity)
+        .accessibilityHidden(true)
     }
 
     private var introText: some View {
         VStack(spacing: 10) {
-            Text("Feelo")
-                .font(.system(size: logoSize, weight: .bold))
-                .tracking(-1)
-                .foregroundStyle(Color.textPrimary)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
+            Image("Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 46)
+                .accessibilityLabel("Feelo")
 
             Text("오늘의 감정을 색으로 남겨요")
                 .font(.title2.bold())
+                .tracking(-0.26)
                 .foregroundStyle(Color.textPrimary)
 
             Text("짧게 쓰고 감정을 고르면,\n한 달이 색으로 이어져요.")
                 .font(.body)
-                .lineSpacing(0)
+                .tracking(-0.43)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.textSecondary)
         }
@@ -97,6 +113,7 @@ struct WelcomeView: View {
         Button(action: onStart) {
             Text("시작하기")
                 .font(.body.weight(.medium))
+                .tracking(-0.43)
                 .foregroundStyle(Color.tintOnPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -108,10 +125,9 @@ struct WelcomeView: View {
 
 private struct HeroAura: Identifiable {
     let emotion: Emotion
-    let size: CGFloat
     let x: CGFloat
     let y: CGFloat
-    let blur: CGFloat
+    let frame: CGFloat
 
     var id: Emotion { emotion }
 }
