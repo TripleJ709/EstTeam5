@@ -1,12 +1,7 @@
 import Foundation
 
 extension Retrospective {
-    static func inPeriod(
-        _ items: [Retrospective],
-        _ period: StatisticsPeriod,
-        of date: Date,
-        calendar: Calendar = .current
-    ) -> [Retrospective] {
+    static func inPeriod(_ items: [Retrospective], _ period: StatisticsPeriod, of date: Date, calendar: Calendar = .current) -> [Retrospective] {
         items.filter { calendar.isDate($0.date, equalTo: date, toGranularity: period.calendarComponent) }
     }
 
