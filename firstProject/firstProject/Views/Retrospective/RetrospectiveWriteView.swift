@@ -180,29 +180,53 @@ struct RetrospectiveWriteView: View {
             .disabled(!draft.canRecommend || recommendation == .loading)
 
             recommendationNote
-                .font(.footnote)
-                .padding(.horizontal, 16)
         }
         .padding(.top, 8)
+        .animation(.easeInOut(duration: 0.2), value: recommendation)
+        .animation(.easeInOut(duration: 0.2), value: draft.emotion)
     }
 
     @ViewBuilder
     private var recommendationNote: some View {
         switch recommendation {
-        case .recommended(let emotion):
-            if draft.emotion == emotion {
-                Text("AI가 \(emotion.displayName) 감정을 추천했어요. 위에서 직접 바꿀 수도 있어요.")
-                    .foregroundStyle(Color.textSecondary)
-            } else {
-                Text("")
-                    .foregroundStyle(Color.textSecondary)
+        case .recommended(let result):
+            if draft.emotion == result.emotion {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Color.tintPrimary)
+                        Text("AI 추천 · \(result.emotion.displayName)")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Color.tintPrimary)
+                    }
+
+                    if !result.reason.isEmpty {
+                        Text(result.reason)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Text("위에서 다른 감정을 직접 바꿀 수도 있어요.")
+                        .font(.caption)
+                        .foregroundStyle(Color.textSecondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(14)
+                .background(Color.bgSelected, in: RoundedRectangle(cornerRadius: 20))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 20)
+                        .strokeBorder(Color.tintPrimary.opacity(0.35), lineWidth: 1)
+                }
             }
         case .failed(let message):
             Text(message)
+                .font(.footnote)
                 .foregroundStyle(Color.statusDestructive)
+                .padding(.horizontal, 16)
         default:
-            Text("")
-                .foregroundStyle(Color.textSecondary)
+            EmptyView()
         }
     }
 
@@ -219,9 +243,9 @@ struct RetrospectiveWriteView: View {
         recommendation = .loading
         recommendTask = Task {
             do {
-                let emotion = try await recommender.recommend(for: content)
-                draft.emotion = emotion
-                recommendation = .recommended(emotion)
+                let result = try await recommender.recommend(for: content)
+                draft.emotion = result.emotion
+                recommendation = .recommended(result)
             } catch is CancellationError {
                 recommendation = .idle
             } catch let error as OpenAIError {
@@ -254,7 +278,7 @@ struct RetrospectiveWriteView: View {
 private enum RecommendationState: Equatable {
     case idle
     case loading
-    case recommended(Emotion)
+    case recommended(EmotionRecommendation)
     case failed(String)
 }
 
