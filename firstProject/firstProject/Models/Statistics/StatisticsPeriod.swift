@@ -6,8 +6,6 @@ enum StatisticsPeriod: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    private static let locale = Locale(identifier: "ko_KR")
-
     var calendarComponent: Calendar.Component {
         switch self {
         case .week: .weekOfYear
@@ -45,26 +43,19 @@ enum StatisticsPeriod: String, CaseIterable, Identifiable {
 
     func days(of anchor: Date, calendar: Calendar = .current) -> [Date] {
         guard let interval = calendar.dateInterval(of: calendarComponent, for: anchor) else { return [] }
-        var result: [Date] = []
-        var cursor = interval.start
-        while cursor < interval.end {
-            result.append(cursor)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
-            cursor = next
-        }
-        return result
+        return calendar.days(in: interval)
     }
 
     func title(of anchor: Date, calendar: Calendar = .current) -> String {
         switch self {
         case .month:
-            return anchor.formatted(.dateTime.year().month(.wide).locale(Self.locale))
+            return anchor.formatted(.dateTime.year().month(.wide).locale(.korean))
         case .week:
             let periodDays = days(of: anchor, calendar: calendar)
             guard let first = periodDays.first, let last = periodDays.last else { return "" }
-            let startStyle = Date.FormatStyle.dateTime.month().day().locale(Self.locale)
+            let startStyle = Date.FormatStyle.dateTime.month().day().locale(.korean)
             let endStyle = calendar.isDate(first, equalTo: last, toGranularity: .month)
-                ? Date.FormatStyle.dateTime.day().locale(Self.locale)
+                ? Date.FormatStyle.dateTime.day().locale(.korean)
                 : startStyle
             return "\(first.formatted(startStyle)) – \(last.formatted(endStyle))"
         }

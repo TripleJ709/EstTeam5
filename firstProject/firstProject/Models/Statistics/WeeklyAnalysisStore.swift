@@ -6,6 +6,13 @@ enum WeeklyAnalysisState: Equatable {
     case loading
     case loaded(WeeklyReflectionAnalysis)
     case failed(String)
+
+    var isLoaded: Bool {
+        switch self {
+        case .loaded: true
+        default: false
+        }
+    }
 }
 
 @Observable
@@ -29,10 +36,12 @@ final class WeeklyAnalysisStore {
                 state = .loaded(result)
             } catch is CancellationError {
                 return
+            } catch let error as OpenAIError {
+                guard !Task.isCancelled else { return }
+                state = .failed(error.userMessage(for: WeeklyReflectionAnalyzer.feature))
             } catch {
                 guard !Task.isCancelled else { return }
-                let known = error as? WeeklyReflectionAnalyzerError ?? .invalidResponse
-                state = .failed(known.userMessage)
+                state = .failed(OpenAIError.invalidResponse.userMessage(for: WeeklyReflectionAnalyzer.feature))
             }
         }
     }

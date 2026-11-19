@@ -22,17 +22,17 @@ struct EmptyDayCard: View {
     var body: some View {
         layout {
             Circle()
-                .strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                .strokeBorder(Color.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
                 .frame(width: iconSize, height: iconSize)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(content.title)
                     .font(.body.weight(.medium))
-                    .foregroundStyle(FeeloColor.textPrimary)
+                    .foregroundStyle(Color.textPrimary)
                 Text(content.message)
                     .font(.subheadline)
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
@@ -41,17 +41,17 @@ struct EmptyDayCard: View {
                 Button(action: onWrite) {
                     Text(buttonTitle)
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(FeeloColor.onTint)
+                        .foregroundStyle(Color.tintOnPrimary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .frame(minHeight: 36)
-                        .background(FeeloColor.tint, in: Capsule())
+                        .background(Color.tintPrimary, in: Capsule())
                 }
                 .fixedSize()
             }
         }
         .padding(16)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.calendar))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 28))
     }
 }
 
@@ -61,5 +61,5 @@ struct EmptyDayCard: View {
         EmptyDayCard(content: .init(title: "아직 오지 않은 날이에요", message: "그날이 되면 회고를 남길 수 있어요", buttonTitle: nil))
     }
     .padding(16)
-    .background(FeeloColor.bgApp)
+    .background(Color.bgApp)
 }

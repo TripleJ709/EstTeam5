@@ -9,7 +9,7 @@ struct CalendarView: View {
 
     private var calendar: Calendar {
         var calendar = Calendar.current
-        calendar.locale = Locale(identifier: "ko_KR")
+        calendar.locale = .korean
         return calendar
     }
 
@@ -35,7 +35,7 @@ struct CalendarView: View {
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 10)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.calendar))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 28))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
@@ -47,7 +47,7 @@ struct CalendarView: View {
             ForEach(ordered.indices, id: \.self) { index in
                 Text(ordered[index])
                     .font(.footnote.weight(.medium))
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
                     .frame(height: 20)
             }
         }
@@ -61,26 +61,14 @@ struct CalendarView: View {
               let lastWeek = calendar.dateInterval(of: .weekOfMonth, for: lastDay) else {
             return []
         }
-        var result: [Date] = []
-        var cursor = firstWeek.start
-        while cursor < lastWeek.end {
-            result.append(cursor)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
-            cursor = next
-        }
-        return result
-    }
-
-    private func emotion(on date: Date) -> Emotion? {
-        retrospectives
-            .filter { calendar.isDate($0.date, inSameDayAs: date) }
-            .max { $0.createdAt < $1.createdAt }?
-            .emotion
+        return calendar.days(in: DateInterval(start: firstWeek.start, end: lastWeek.end))
     }
 
     private func marker(for date: Date) -> DayCell.Marker {
         guard calendar.isDate(date, equalTo: month, toGranularity: .month) else { return .none }
-        if let emotion = emotion(on: date) { return .emotion(emotion) }
+        if let latest = Retrospective.latest(in: retrospectives, on: date, calendar: calendar) {
+            return .emotion(latest.emotion)
+        }
         let day = calendar.startOfDay(for: date)
         if day < calendar.startOfDay(for: today), day >= calendar.startOfDay(for: installDate) {
             return .missed
@@ -110,7 +98,7 @@ private struct DayCell: View {
             VStack(spacing: 4) {
                 Text("\(day)")
                     .font(isEmphasized ? .body.weight(.medium) : .callout)
-                    .foregroundStyle(isEmphasized ? FeeloColor.tint : FeeloColor.textPrimary)
+                    .foregroundStyle(isEmphasized ? Color.tintPrimary : Color.textPrimary)
                     .opacity(isOutside ? 0.35 : 1)
                 markerView
             }
@@ -118,8 +106,8 @@ private struct DayCell: View {
             .frame(maxWidth: .infinity)
             .frame(height: cellHeight)
             .background(
-                isSelected && !isOutside ? FeeloColor.bgSelected : .clear,
-                in: RoundedRectangle(cornerRadius: FeeloRadius.cell)
+                isSelected && !isOutside ? Color.bgSelected : .clear,
+                in: RoundedRectangle(cornerRadius: 14)
             )
             .contentShape(Rectangle())
         }
@@ -135,7 +123,7 @@ private struct DayCell: View {
             EmotionAuraView(emotion: emotion, size: markerSize)
         case .missed:
             Circle()
-                .strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                .strokeBorder(Color.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
                 .frame(width: markerSize, height: markerSize)
         case .none:
             Color.clear.frame(width: markerSize, height: markerSize)
@@ -144,7 +132,7 @@ private struct DayCell: View {
 
     private var accessibilityText: String {
         let dateText = (isToday ? "오늘, " : "")
-            + date.formatted(.dateTime.month().day().locale(Locale(identifier: "ko_KR")))
+            + date.formatted(.dateTime.month().day().locale(.korean))
         switch marker {
         case .emotion(let emotion): return "\(dateText), \(emotion.displayName)"
         case .missed: return "\(dateText), 기록 없음"
@@ -157,5 +145,5 @@ private struct DayCell: View {
     @Previewable @State var selected = Date.now
     CalendarView(month: .now, retrospectives: [], selectedDate: $selected)
         .padding(16)
-        .background(FeeloColor.bgApp)
+        .background(Color.bgApp)
 }

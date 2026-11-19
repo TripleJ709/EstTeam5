@@ -10,7 +10,6 @@ struct StatisticsView: View {
     @State private var weeklyAnalysis = WeeklyAnalysisStore()
 
     @Environment(\.dynamicTypeSize) private var typeSize
-    @ScaledMetric(relativeTo: .title3) private var summaryAuraSize = 20
     private static let emptyMessage = "회고를 남기면 감정 흐름과 분포가 채워져요"
 
     private var periodItems: [Retrospective] {
@@ -40,14 +39,14 @@ struct StatisticsView: View {
             .background { screenBackground }
             .navigationTitle("감정 돌아보기")
         }
-        .tint(FeeloColor.tint)
+        .tint(Color.tintPrimary)
         .onChange(of: anchorDate) { weeklyAnalysis.reset() }
         .onChange(of: period) { weeklyAnalysis.reset() }
     }
 
     private var screenBackground: some View {
         ZStack(alignment: .top) {
-            FeeloColor.bgApp
+            Color.bgApp
 
             if let top = topEmotion {
                 EmotionWash(emotion: top, opacity: 0.55, blur: 30)
@@ -81,7 +80,7 @@ struct StatisticsView: View {
         HStack(spacing: 0) {
             Text(period.title(of: anchorDate))
                 .font(.title3.weight(.medium))
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             navigationButton(systemName: "chevron.left", label: "이전", offset: -1)
@@ -98,7 +97,7 @@ struct StatisticsView: View {
         } label: {
             Image(systemName: systemName)
                 .font(.title3.weight(.medium))
-                .foregroundStyle(FeeloColor.tint)
+                .foregroundStyle(Color.tintPrimary)
                 .frame(width: 44, height: 44)
         }
         .accessibilityLabel(label)
@@ -112,21 +111,15 @@ struct StatisticsView: View {
 
     private var summaryCards: some View {
         summaryLayout {
-            StatCard(label: period.recordCountLabel) {
-                Text("\(periodItems.count)건")
-            }
-            StatCard(label: "가장 많은 감정") {
-                if let top = topEmotion {
-                    HStack(spacing: 8) {
-                        EmotionAuraView(emotion: top, size: summaryAuraSize)
-                        Text("\(top.displayName) \(Retrospective.count(of: top, in: periodItems))회")
-                    }
-                } else {
-                    Text("-")
-                }
-            }
+            StatCard(label: period.recordCountLabel, value: "\(periodItems.count)건")
+            StatCard(label: "가장 많은 감정", value: topEmotionText, emotion: topEmotion)
         }
         .padding(.horizontal, 16)
+    }
+
+    private var topEmotionText: String {
+        guard let top = topEmotion else { return "-" }
+        return "\(top.displayName) \(Retrospective.count(of: top, in: periodItems))회"
     }
 
     private func distributionSection(highlighted: Emotion) -> some View {
@@ -140,29 +133,37 @@ struct StatisticsView: View {
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(FeeloColor.textSecondary)
+            .foregroundStyle(Color.textSecondary)
             .padding(.horizontal, 16)
             .padding(.top, 8)
     }
 }
 
-private struct StatCard<Value: View>: View {
+private struct StatCard: View {
     let label: String
-    @ViewBuilder let value: Value
+    let value: String
+    var emotion: Emotion? = nil
+
+    @ScaledMetric(relativeTo: .title3) private var auraSize = 20
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.footnote)
-                .foregroundStyle(FeeloColor.textSecondary)
-            value
-                .font(.title3.bold())
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textSecondary)
+            HStack(spacing: 8) {
+                if let emotion {
+                    EmotionAuraView(emotion: emotion, size: auraSize)
+                }
+                Text(value)
+            }
+            .font(.title3.bold())
+            .foregroundStyle(Color.textPrimary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.summary))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 24))
         .accessibilityElement(children: .combine)
     }
 }

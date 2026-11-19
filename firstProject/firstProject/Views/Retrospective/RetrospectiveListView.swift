@@ -25,7 +25,7 @@ struct RetrospectiveListView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(monthSummary)
                         .font(.subheadline)
-                        .foregroundStyle(FeeloColor.textSecondary)
+                        .foregroundStyle(Color.textSecondary)
                         .padding(.horizontal, 16)
                         .padding(.top, -6)
 
@@ -37,7 +37,7 @@ struct RetrospectiveListView: View {
                 }
                 .padding(.bottom, 24)
             }
-            .background(FeeloColor.bgApp.ignoresSafeArea())
+            .background(Color.bgApp.ignoresSafeArea())
             .navigationTitle("회고")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -47,18 +47,18 @@ struct RetrospectiveListView: View {
                         Image(systemName: "gearshape")
                             .accessibilityLabel("테마 설정")
                     }
-                    .tint(FeeloColor.tint)
+                    .tint(Color.tintPrimary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         writeRequest = WriteRequest(date: today)
                     } label: {
                         Image(systemName: "plus")
-                            .foregroundStyle(FeeloColor.onTint)
+                            .foregroundStyle(Color.tintOnPrimary)
                             .accessibilityLabel("회고 작성")
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(FeeloColor.tint)
+                    .tint(Color.tintPrimary)
                 }
             }
             .alert("테마", isPresented: $isShowingThemeAlert) {
@@ -81,9 +81,9 @@ struct RetrospectiveListView: View {
 
     private var monthNavigation: some View {
         HStack(spacing: 0) {
-            Text(displayedMonth.formatted(.dateTime.year().month(.wide).locale(Locale(identifier: "ko_KR"))))
+            Text(displayedMonth.formatted(.dateTime.year().month(.wide).locale(.korean)))
                 .font(.title3.weight(.medium))
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             monthButton(systemName: "chevron.left", label: "이전 달", offset: -1)
@@ -101,7 +101,7 @@ struct RetrospectiveListView: View {
         } label: {
             Image(systemName: systemName)
                 .font(.title3.weight(.medium))
-                .foregroundStyle(FeeloColor.tint)
+                .foregroundStyle(Color.tintPrimary)
                 .frame(width: 44, height: 44)
         }
         .accessibilityLabel(label)
@@ -122,12 +122,20 @@ struct RetrospectiveListView: View {
         .accessibilityHidden(true)
     }
 
-    // Grid는 열 폭을 내용 크기로 계산하므로 ViewThatFits가 실제로 들어가는 열 수를 고를 수 있다.
     private func legendGrid(columns: Int) -> some View {
-        let emotions = Emotion.allCases
-        let rows = stride(from: 0, to: emotions.count, by: columns).map {
-            Array(emotions[$0..<min($0 + columns, emotions.count)])
+        var rows: [[Emotion]] = []
+        var currentRow: [Emotion] = []
+        for emotion in Emotion.allCases {
+            currentRow.append(emotion)
+            if currentRow.count == columns {
+                rows.append(currentRow)
+                currentRow = []
+            }
         }
+        if !currentRow.isEmpty {
+            rows.append(currentRow)
+        }
+
         return Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
             ForEach(rows.indices, id: \.self) { index in
                 GridRow {
@@ -142,7 +150,7 @@ struct RetrospectiveListView: View {
             EmotionAuraView(emotion: emotion, size: 10)
             Text(emotion.displayName)
                 .font(.caption)
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
                 .fixedSize()
         }
     }
@@ -152,7 +160,7 @@ struct RetrospectiveListView: View {
         return VStack(alignment: .leading, spacing: 0) {
             Text(previewHeader(count: items.count))
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
                 .frame(minHeight: 42)
                 .padding(.horizontal, 32)
 
@@ -195,7 +203,7 @@ struct RetrospectiveListView: View {
     }
 
     private func previewHeader(count: Int) -> String {
-        var text = selectedDate.formatted(.dateTime.month().day().weekday(.wide).locale(Locale(identifier: "ko_KR")))
+        var text = selectedDate.formatted(.dateTime.month().day().weekday(.wide).locale(.korean))
         if isSelectedToday && count == 0 { text = "오늘 · " + text }
         if count > 1 { text += " · \(count)개" }
         return text
@@ -215,7 +223,7 @@ struct RetrospectiveListView: View {
     }
 
     private func timeText(_ date: Date) -> String {
-        date.formatted(.dateTime.hour().minute().locale(Locale(identifier: "ko_KR")))
+        date.formatted(.dateTime.hour().minute().locale(.korean))
     }
 
     private var monthSummary: String {
@@ -243,23 +251,23 @@ private struct RetroPreviewCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.body.weight(.medium))
-                    .foregroundStyle(FeeloColor.textPrimary)
+                    .foregroundStyle(Color.textPrimary)
                 Text(content)
                     .font(.subheadline)
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background {
             ZStack(alignment: .leading) {
-                FeeloColor.bgCard
+                Color.bgCard
                 Ellipse()
                     .fill(RadialGradient(colors: [emotion.auraStart, emotion.auraEnd],
                                          center: .center, startRadius: 0, endRadius: 36))
@@ -268,7 +276,7 @@ private struct RetroPreviewCard: View {
                     .opacity(0.3)
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: FeeloRadius.card))
+        .clipShape(RoundedRectangle(cornerRadius: 26))
     }
 }
 

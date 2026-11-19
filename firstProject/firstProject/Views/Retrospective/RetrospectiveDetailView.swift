@@ -9,11 +9,9 @@ struct RetrospectiveDetailView: View {
     @State private var isEditing = false
     @State private var isConfirmingDelete = false
 
-    private static let locale = Locale(identifier: "ko_KR")
-
     var body: some View {
         ZStack(alignment: .top) {
-            FeeloColor.bgApp.ignoresSafeArea()
+            Color.bgApp.ignoresSafeArea()
 
             EmotionWash(emotion: retrospective.emotion)
                 .offset(y: -90)
@@ -57,8 +55,8 @@ struct RetrospectiveDetailView: View {
     }
 
     private var navigationTitleText: String {
-        let day = retrospective.date.formatted(.dateTime.month().day().locale(Self.locale))
-        let weekday = retrospective.date.formatted(.dateTime.weekday(.abbreviated).locale(Self.locale))
+        let day = retrospective.date.formatted(.dateTime.month().day().locale(.korean))
+        let weekday = retrospective.date.formatted(.dateTime.weekday(.abbreviated).locale(.korean))
         return "\(day) (\(weekday))"
     }
 
@@ -67,12 +65,12 @@ struct RetrospectiveDetailView: View {
             EmotionAuraView(emotion: retrospective.emotion, size: 72)
             Text(retrospective.emotion.displayName)
                 .font(.title2.bold())
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
             Text(retrospective.date.formatted(
-                .dateTime.year().month().day().weekday(.wide).hour().minute().locale(Self.locale)
+                .dateTime.year().month().day().weekday(.wide).hour().minute().locale(.korean)
             ))
             .font(.footnote)
-            .foregroundStyle(FeeloColor.textSecondary)
+            .foregroundStyle(Color.textSecondary)
         }
         .padding(.top, 8)
         .frame(maxWidth: .infinity)
@@ -83,15 +81,15 @@ struct RetrospectiveDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("회고")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
                 .padding(.horizontal, 16)
 
             Text(retrospective.content)
                 .font(.body)
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
-                .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+                .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 26))
         }
         .padding(.horizontal, 16)
     }

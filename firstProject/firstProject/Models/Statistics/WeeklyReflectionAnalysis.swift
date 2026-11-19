@@ -1,6 +1,6 @@
 import Foundation
 
-struct WeeklyReflectionAnalysis: Equatable, Sendable {
+struct WeeklyReflectionAnalysis: Equatable, Sendable, Decodable {
     let facts: String
     let emotionalFlow: String
     let positives: String

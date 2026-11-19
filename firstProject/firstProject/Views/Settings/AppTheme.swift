@@ -15,7 +15,6 @@ enum AppTheme: String, CaseIterable, Identifiable {
         }
     }
 
-    /// nil이면 기기 설정을 따른다.
     var colorScheme: ColorScheme? {
         switch self {
         case .system: nil

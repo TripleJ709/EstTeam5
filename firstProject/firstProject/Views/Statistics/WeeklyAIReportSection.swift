@@ -27,15 +27,15 @@ struct WeeklyAIReportSection: View {
         HStack {
             Text("AI 주간 회고 리포트")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
 
             Spacer()
 
-            if case .loaded = state {
+            if state.isLoaded {
                 Button(action: onAnalyze) {
                     Label("다시 분석", systemImage: "arrow.clockwise")
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(FeeloColor.textSecondary)
+                        .foregroundStyle(Color.textSecondary)
                 }
             }
         }
@@ -48,15 +48,15 @@ struct WeeklyAIReportSection: View {
             HStack(spacing: 10) {
                 Image(systemName: "sparkles")
                     .font(.title3)
-                    .foregroundStyle(FeeloColor.tint)
+                    .foregroundStyle(Color.tintPrimary)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("6가지 사고 모델로 이번 주 돌아보기")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(FeeloColor.textPrimary)
+                        .foregroundStyle(Color.textPrimary)
                     Text("작성한 회고들을 모아 일어난 일, 마음의 흐름, 좋았던 순간, 마음 쓰인 일, 작은 힌트, 이번 주 한줄로 정리해 드려요.")
                         .font(.footnote)
-                        .foregroundStyle(FeeloColor.textSecondary)
+                        .foregroundStyle(Color.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -64,7 +64,7 @@ struct WeeklyAIReportSection: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.footnote)
-                    .foregroundStyle(FeeloColor.destructive)
+                    .foregroundStyle(Color.statusDestructive)
             }
 
             Button(action: onAnalyze) {
@@ -84,7 +84,7 @@ struct WeeklyAIReportSection: View {
             .disabled(isLoading)
         }
         .padding(16)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.summary))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 24))
     }
 
     private func reportCard(_ analysis: WeeklyReflectionAnalysis) -> some View {
@@ -94,7 +94,7 @@ struct WeeklyAIReportSection: View {
             }
         }
         .padding(16)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.summary))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 24))
     }
 }
 
@@ -116,7 +116,7 @@ private struct ThinkingStepRow: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: Self.icons[step.id] ?? Self.fallbackIcon)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .frame(width: 28, height: 28)
                 .background(
                     LinearGradient(
@@ -130,10 +130,10 @@ private struct ThinkingStepRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(step.title)
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
                 Text(step.content)
                     .font(.subheadline)
-                    .foregroundStyle(FeeloColor.textPrimary)
+                    .foregroundStyle(Color.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

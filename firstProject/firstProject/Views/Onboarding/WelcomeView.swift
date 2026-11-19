@@ -3,14 +3,14 @@ import SwiftUI
 struct WelcomeView: View {
     let onStart: () -> Void
 
-    private let auras: [(emotion: Emotion, size: CGFloat, x: CGFloat, y: CGFloat, blur: CGFloat)] = [
-        (.joy, 150, 150, 70, 2),
-        (.achievement, 104, 40, 40, 1),
-        (.stable, 100, 270, 30, 0.5),
-        (.sad, 130, 250, 190, 1),
-        (.fear, 120, 30, 190, 1.5),
-        (.angry, 96, 149, 270, 3),
-        (.exhausted, 64, 300, 330, 4),
+    private let auras: [HeroAura] = [
+        HeroAura(emotion: .joy, size: 150, x: 150, y: 70, blur: 2),
+        HeroAura(emotion: .achievement, size: 104, x: 40, y: 40, blur: 1),
+        HeroAura(emotion: .stable, size: 100, x: 270, y: 30, blur: 0.5),
+        HeroAura(emotion: .sad, size: 130, x: 250, y: 190, blur: 1),
+        HeroAura(emotion: .fear, size: 120, x: 30, y: 190, blur: 1.5),
+        HeroAura(emotion: .angry, size: 96, x: 149, y: 270, blur: 3),
+        HeroAura(emotion: .exhausted, size: 64, x: 300, y: 330, blur: 4)
     ]
 
     @ScaledMetric(relativeTo: .largeTitle) private var logoSize = 52
@@ -32,7 +32,7 @@ struct WelcomeView: View {
             startButton
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
-                .background(FeeloColor.bgApp.ignoresSafeArea(edges: .bottom))
+                .background(Color.bgApp.ignoresSafeArea(edges: .bottom))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(alignment: .topLeading) { background }
@@ -40,7 +40,7 @@ struct WelcomeView: View {
 
     private var background: some View {
         ZStack(alignment: .topLeading) {
-            FeeloColor.bgApp
+            Color.bgApp
 
             Circle()
                 .fill(
@@ -62,8 +62,7 @@ struct WelcomeView: View {
 
     private var hero: some View {
         ZStack(alignment: .topLeading) {
-            ForEach(auras.indices, id: \.self) { index in
-                let aura = auras[index]
+            ForEach(auras) { aura in
                 heroOrb(aura.emotion, size: aura.size, blur: aura.blur)
                     .offset(x: aura.x, y: aura.y)
             }
@@ -98,19 +97,19 @@ struct WelcomeView: View {
             Text("Feelo")
                 .font(.system(size: logoSize, weight: .bold))
                 .tracking(-1)
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
             Text("오늘의 감정을 색으로 남겨요")
                 .font(.title2.bold())
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
 
             Text("짧게 쓰고 감정을 고르면,\n한 달이 색으로 이어져요.")
                 .font(.body)
                 .lineSpacing(0)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
         }
     }
 
@@ -118,13 +117,23 @@ struct WelcomeView: View {
         Button(action: onStart) {
             Text("시작하기")
                 .font(.body.weight(.medium))
-                .foregroundStyle(FeeloColor.onTint)
+                .foregroundStyle(Color.tintOnPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .frame(minHeight: 52)
-                .background(FeeloColor.tint, in: Capsule())
+                .background(Color.tintPrimary, in: Capsule())
         }
     }
+}
+
+private struct HeroAura: Identifiable {
+    let emotion: Emotion
+    let size: CGFloat
+    let x: CGFloat
+    let y: CGFloat
+    let blur: CGFloat
+
+    var id: Emotion { emotion }
 }
 
 #Preview {
