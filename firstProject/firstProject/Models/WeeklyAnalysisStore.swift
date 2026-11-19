@@ -31,8 +31,8 @@ final class WeeklyAnalysisStore {
                 return
             } catch {
                 guard !Task.isCancelled else { return }
-                let known = error as? WeeklyReflectionAnalyzerError ?? .invalidResponse
-                state = .failed(known.userMessage)
+                let known = error as? OpenAIError ?? .invalidResponse
+                state = .failed(known.userMessage(for: WeeklyReflectionAnalyzer.feature))
             }
         }
     }

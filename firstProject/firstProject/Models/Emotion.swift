@@ -1,6 +1,6 @@
 import Foundation
 
-enum Emotion: String, CaseIterable, Identifiable {
+enum Emotion: String, CaseIterable, Identifiable, Decodable {
     case joy
     case achievement
     case stable

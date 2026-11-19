@@ -210,10 +210,9 @@ struct RetrospectiveWriteView: View {
                 recommendation = .recommended(emotion)
             } catch is CancellationError {
                 recommendation = .idle
-            } catch let error as EmotionRecommenderError {
-                recommendation = .failed(error.userMessage)
             } catch {
-                recommendation = .failed(EmotionRecommenderError.invalidResponse.userMessage)
+                let known = error as? OpenAIError ?? .invalidResponse
+                recommendation = .failed(known.userMessage(for: EmotionRecommender.feature))
             }
         }
     }
