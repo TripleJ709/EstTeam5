@@ -4,13 +4,13 @@ struct WelcomeView: View {
     let onStart: () -> Void
 
     private let auras: [HeroAura] = [
-        HeroAura(emotion: .joy, size: 150, x: 150, y: 70, blur: 2),
-        HeroAura(emotion: .achievement, size: 104, x: 40, y: 40, blur: 1),
-        HeroAura(emotion: .stable, size: 100, x: 270, y: 30, blur: 0.5),
-        HeroAura(emotion: .sad, size: 130, x: 250, y: 190, blur: 1),
-        HeroAura(emotion: .fear, size: 120, x: 30, y: 190, blur: 1.5),
-        HeroAura(emotion: .angry, size: 96, x: 149, y: 270, blur: 3),
-        HeroAura(emotion: .exhausted, size: 64, x: 300, y: 330, blur: 4)
+        HeroAura(emotion: .joy, size: 195, x: 128, y: 48, blur: 2),
+        HeroAura(emotion: .achievement, size: 135, x: 25, y: 25, blur: 1),
+        HeroAura(emotion: .stable, size: 130, x: 255, y: 15, blur: 0.5),
+        HeroAura(emotion: .sad, size: 169, x: 231, y: 171, blur: 1),
+        HeroAura(emotion: .fear, size: 156, x: 12, y: 172, blur: 1.5),
+        HeroAura(emotion: .angry, size: 125, x: 135, y: 256, blur: 3),
+        HeroAura(emotion: .exhausted, size: 83, x: 291, y: 321, blur: 4)
     ]
 
     @ScaledMetric(relativeTo: .largeTitle) private var logoSize = 52
@@ -22,7 +22,7 @@ struct WelcomeView: View {
                     .padding(.top, 34)
 
                 introText
-                    .padding(.top, 25)
+                    .padding(.top, 22)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 24)
             }
@@ -63,33 +63,13 @@ struct WelcomeView: View {
     private var hero: some View {
         ZStack(alignment: .topLeading) {
             ForEach(auras) { aura in
-                heroOrb(aura.emotion, size: aura.size, blur: aura.blur)
+                EmotionAuraView(emotion: aura.emotion, size: aura.size)
+                    .blur(radius: aura.blur)
                     .offset(x: aura.x, y: aura.y)
             }
         }
         .frame(width: 402, height: 430, alignment: .topLeading)
         .frame(maxWidth: .infinity)
-    }
-
-    private func heroOrb(_ emotion: Emotion, size: CGFloat, blur: CGFloat) -> some View {
-        let orb = Circle()
-            .fill(
-                RadialGradient(
-                    colors: [emotion.auraStart, emotion.auraEnd],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: size / 2
-                )
-            )
-            .frame(width: size, height: size)
-
-        return ZStack {
-            orb.opacity(0.5).blur(radius: 3)
-            orb
-        }
-        .blur(radius: blur)
-        .frame(width: size, height: size)
-        .accessibilityHidden(true)
     }
 
     private var introText: some View {
