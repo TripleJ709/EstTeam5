@@ -7,12 +7,7 @@ extension Retrospective {
         of date: Date,
         calendar: Calendar = .current
     ) -> [Retrospective] {
-        switch period {
-        case .month:
-            inMonth(items, of: date, calendar: calendar)
-        case .week:
-            items.filter { calendar.isDate($0.date, equalTo: date, toGranularity: period.calendarComponent) }
-        }
+        items.filter { calendar.isDate($0.date, equalTo: date, toGranularity: period.calendarComponent) }
     }
 
     static func emotionCounts(in items: [Retrospective]) -> [(emotion: Emotion, count: Int)] {

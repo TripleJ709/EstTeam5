@@ -81,7 +81,7 @@ struct RetrospectiveListView: View {
 
     private var monthNavigation: some View {
         HStack(spacing: 0) {
-            Text(displayedMonth.formatted(.dateTime.year().month(.wide).locale(Locale(identifier: "ko_KR"))))
+            Text(displayedMonth.formatted(.dateTime.year().month(.wide).locale(.korean)))
                 .font(.title3.weight(.medium))
                 .foregroundStyle(FeeloColor.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -195,7 +195,7 @@ struct RetrospectiveListView: View {
     }
 
     private func previewHeader(count: Int) -> String {
-        var text = selectedDate.formatted(.dateTime.month().day().weekday(.wide).locale(Locale(identifier: "ko_KR")))
+        var text = selectedDate.formatted(.dateTime.month().day().weekday(.wide).locale(.korean))
         if isSelectedToday && count == 0 { text = "오늘 · " + text }
         if count > 1 { text += " · \(count)개" }
         return text
@@ -215,7 +215,7 @@ struct RetrospectiveListView: View {
     }
 
     private func timeText(_ date: Date) -> String {
-        date.formatted(.dateTime.hour().minute().locale(Locale(identifier: "ko_KR")))
+        date.formatted(.dateTime.hour().minute().locale(.korean))
     }
 
     private var monthSummary: String {

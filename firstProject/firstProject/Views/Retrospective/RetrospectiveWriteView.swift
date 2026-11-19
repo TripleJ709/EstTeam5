@@ -20,7 +20,7 @@ struct RetrospectiveWriteView: View {
 
     init(retrospective: Retrospective? = nil, date: Date? = nil) {
         self.retrospective = retrospective
-        _draft = State(initialValue: retrospective.map(RetrospectiveDraft.init) ?? RetrospectiveDraft(date: date ?? .now))
+        _draft = State(initialValue: retrospective.map { RetrospectiveDraft($0) } ?? RetrospectiveDraft(date: date ?? .now))
     }
 
     var body: some View {
@@ -100,7 +100,7 @@ struct RetrospectiveWriteView: View {
     private var datePicker: some View {
         DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
             .labelsHidden()
-            .environment(\.locale, Locale(identifier: "ko_KR"))
+            .environment(\.locale, .korean)
     }
 
     private var emotionSection: some View {

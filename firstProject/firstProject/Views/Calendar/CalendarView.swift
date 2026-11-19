@@ -9,7 +9,7 @@ struct CalendarView: View {
 
     private var calendar: Calendar {
         var calendar = Calendar.current
-        calendar.locale = Locale(identifier: "ko_KR")
+        calendar.locale = .korean
         return calendar
     }
 
@@ -61,26 +61,14 @@ struct CalendarView: View {
               let lastWeek = calendar.dateInterval(of: .weekOfMonth, for: lastDay) else {
             return []
         }
-        var result: [Date] = []
-        var cursor = firstWeek.start
-        while cursor < lastWeek.end {
-            result.append(cursor)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
-            cursor = next
-        }
-        return result
-    }
-
-    private func emotion(on date: Date) -> Emotion? {
-        retrospectives
-            .filter { calendar.isDate($0.date, inSameDayAs: date) }
-            .max { $0.createdAt < $1.createdAt }?
-            .emotion
+        return calendar.days(in: DateInterval(start: firstWeek.start, end: lastWeek.end))
     }
 
     private func marker(for date: Date) -> DayCell.Marker {
         guard calendar.isDate(date, equalTo: month, toGranularity: .month) else { return .none }
-        if let emotion = emotion(on: date) { return .emotion(emotion) }
+        if let latest = Retrospective.latest(in: retrospectives, on: date, calendar: calendar) {
+            return .emotion(latest.emotion)
+        }
         let day = calendar.startOfDay(for: date)
         if day < calendar.startOfDay(for: today), day >= calendar.startOfDay(for: installDate) {
             return .missed
@@ -144,7 +132,7 @@ private struct DayCell: View {
 
     private var accessibilityText: String {
         let dateText = (isToday ? "오늘, " : "")
-            + date.formatted(.dateTime.month().day().locale(Locale(identifier: "ko_KR")))
+            + date.formatted(.dateTime.month().day().locale(.korean))
         switch marker {
         case .emotion(let emotion): return "\(dateText), \(emotion.displayName)"
         case .missed: return "\(dateText), 기록 없음"

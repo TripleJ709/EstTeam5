@@ -9,8 +9,6 @@ struct RetrospectiveDetailView: View {
     @State private var isEditing = false
     @State private var isConfirmingDelete = false
 
-    private static let locale = Locale(identifier: "ko_KR")
-
     var body: some View {
         ZStack(alignment: .top) {
             FeeloColor.bgApp.ignoresSafeArea()
@@ -57,8 +55,8 @@ struct RetrospectiveDetailView: View {
     }
 
     private var navigationTitleText: String {
-        let day = retrospective.date.formatted(.dateTime.month().day().locale(Self.locale))
-        let weekday = retrospective.date.formatted(.dateTime.weekday(.abbreviated).locale(Self.locale))
+        let day = retrospective.date.formatted(.dateTime.month().day().locale(.korean))
+        let weekday = retrospective.date.formatted(.dateTime.weekday(.abbreviated).locale(.korean))
         return "\(day) (\(weekday))"
     }
 
@@ -69,7 +67,7 @@ struct RetrospectiveDetailView: View {
                 .font(.title2.bold())
                 .foregroundStyle(FeeloColor.textPrimary)
             Text(retrospective.date.formatted(
-                .dateTime.year().month().day().weekday(.wide).hour().minute().locale(Self.locale)
+                .dateTime.year().month().day().weekday(.wide).hour().minute().locale(.korean)
             ))
             .font(.footnote)
             .foregroundStyle(FeeloColor.textSecondary)

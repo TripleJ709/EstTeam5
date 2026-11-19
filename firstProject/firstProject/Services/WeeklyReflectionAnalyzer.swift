@@ -2,7 +2,6 @@ import Foundation
 
 struct WeeklyReflectionAnalyzer {
     static let feature = "분석"
-    private static let locale = Locale(identifier: "ko_KR")
 
     private let client: OpenAIClient
 
@@ -21,8 +20,8 @@ struct WeeklyReflectionAnalyzer {
     }
 
     private static func makeUserContent(from input: WeeklyReflectionInput) -> String {
-        let weekdayStyle = Date.FormatStyle.dateTime.weekday(.abbreviated).locale(locale)
-        let dateStyle = Date.FormatStyle.dateTime.month().day().weekday(.abbreviated).locale(locale)
+        let weekdayStyle = Date.FormatStyle.dateTime.weekday(.abbreviated).locale(.korean)
+        let dateStyle = Date.FormatStyle.dateTime.month().day().weekday(.abbreviated).locale(.korean)
 
         let counts = Emotion.allCases
             .map { "\($0.displayName) \(input.emotionCounts[$0] ?? 0)회" }
