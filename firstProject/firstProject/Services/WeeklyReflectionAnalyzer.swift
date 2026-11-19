@@ -1,14 +1,27 @@
 import Foundation
 
+/// 한 주의 회고를 읽고 6단계 사고 모델로 정리하는 AI 분석기입니다.
+///
+/// 앱이 계산한 건수와 감정 통계를 함께 보내, AI가 숫자를 다시 세지 않고 인용하게 합니다.
+/// 대표 감정은 AI가 고르지 않고 앱의 계산값을 씁니다.
 struct WeeklyReflectionAnalyzer {
+    /// 오류 안내 문구에 들어가는 기능 이름입니다.
     static let feature = "분석"
 
     private let client: OpenAIClient
 
+    /// 분석기를 만듭니다.
+    ///
+    /// - Parameter client: OpenAI 호출에 쓸 클라이언트.
     init(client: OpenAIClient = OpenAIClient()) {
         self.client = client
     }
 
+    /// 한 주의 회고를 분석합니다.
+    ///
+    /// - Parameter input: 한 주의 회고와 앱이 계산한 통계.
+    /// - Returns: 6단계로 정리한 주간 리포트.
+    /// - Throws: `OpenAIError`, 요청이 취소되었을 때의 `CancellationError`.
     func analyze(_ input: WeeklyReflectionInput) async throws -> WeeklyReflectionAnalysis {
         try await client.send(
             system: Self.systemPrompt,

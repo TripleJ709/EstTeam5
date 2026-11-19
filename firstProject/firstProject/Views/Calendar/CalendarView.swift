@@ -1,10 +1,18 @@
 import SwiftUI
 
+/// 한 달의 감정 달력입니다.
+///
+/// 날짜마다 그날 가장 늦게 쓴 회고의 감정 아우라를 보여 주고, 설치 이후 기록하지 않은 날은 점선으로 표시합니다.
 struct CalendarView: View {
+    /// 보여 줄 달에 속한 날짜입니다.
     let month: Date
+    /// 달력에 표시할 회고 목록입니다.
     let retrospectives: [Retrospective]
+    /// 선택한 날짜입니다. 날짜를 누르면 바뀝니다.
     @Binding var selectedDate: Date
+    /// 오늘로 취급할 날짜입니다. 기본값은 지금입니다.
     var today: Date = .now
+    /// 앱을 처음 실행한 날입니다. 이 날짜 이전은 기록하지 않은 날로 표시하지 않습니다.
     var installDate: Date = AppConfig.installDate
 
     private var calendar: Calendar {

@@ -1,8 +1,12 @@
 import SwiftUI
 
+/// 가장 많이 기록한 감정에 맞춘 한마디를 보여 주는 카드입니다.
 struct StatisticsFeedbackCard: View {
+    /// 카드에 아우라로 보여 줄 감정입니다.
     let emotion: Emotion
+    /// 카드 제목입니다. 예: `이번 주의 한마디`
     let title: String
+    /// 보여 줄 한마디 문구입니다.
     let message: String
 
     private enum Metric {

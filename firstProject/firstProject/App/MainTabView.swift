@@ -1,6 +1,7 @@
 import SwiftData
 import SwiftUI
 
+/// 앱의 메인 화면입니다. 회고(달력) 탭과 통계(기록) 탭으로 이루어져 있습니다.
 struct MainTabView: View {
     var body: some View {
         TabView {

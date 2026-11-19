@@ -1,6 +1,11 @@
 import SwiftData
 import SwiftUI
 
+/// 통계(기록) 탭의 화면입니다.
+///
+/// 주간·월간 전환과 기간 이동, 기록 건수와 가장 많은 감정, 감정 분포 막대 그래프,
+/// 감정별 한마디를 보여 줍니다. 주간에서는 AI 주간 회고 리포트도 받을 수 있습니다.
+/// 기록이 없는 기간에는 안내 카드를 보여 줍니다.
 struct StatisticsView: View {
     @Query(sort: \Retrospective.date)
     private var retrospectives: [Retrospective]
@@ -139,6 +144,7 @@ struct StatisticsView: View {
     }
 }
 
+/// 통계 요약 카드입니다. 제목과 값 하나를 보여 주고, 감정이 있으면 아우라를 함께 보여 줍니다.
 private struct StatCard: View {
     let label: String
     let value: String

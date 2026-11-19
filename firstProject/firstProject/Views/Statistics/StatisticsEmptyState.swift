@@ -1,7 +1,10 @@
 import SwiftUI
 
+/// 선택한 기간에 기록이 없을 때 보여 주는 안내 카드입니다.
 struct StatisticsEmptyState: View {
+    /// 안내 제목입니다.
     let title: String
+    /// 안내 문구입니다.
     let message: String
 
     private enum Metric {

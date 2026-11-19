@@ -1,6 +1,8 @@
 import SwiftUI
 
+/// 처음 실행할 때 보여 주는 소개 화면입니다. 7가지 감정 아우라와 앱 소개를 보여 줍니다.
 struct WelcomeView: View {
+    /// 시작 버튼을 눌렀을 때 실행할 동작입니다.
     let onStart: () -> Void
 
     private let auras: [HeroAura] = [

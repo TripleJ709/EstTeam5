@@ -1,13 +1,17 @@
 import SwiftUI
 
+/// 선택한 날짜에 회고가 없을 때 보여 주는 안내 카드입니다.
 struct EmptyDayCard: View {
+    /// 카드에 들어갈 문구입니다.
     struct Content {
         let title: String
         let message: String
         let buttonTitle: String?
     }
 
+    /// 카드에 보여 줄 문구입니다.
     let content: Content
+    /// 회고 쓰기 버튼을 눌렀을 때 실행할 동작입니다.
     var onWrite: () -> Void = {}
 
     @Environment(\.dynamicTypeSize) private var typeSize

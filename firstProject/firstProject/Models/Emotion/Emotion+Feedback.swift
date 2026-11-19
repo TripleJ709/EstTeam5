@@ -1,6 +1,9 @@
 import Foundation
 
 extension Emotion {
+    /// 주간 통계에서 가장 많이 기록한 감정에 맞춰 보여 주는 한마디입니다.
+    ///
+    /// 공감과 격려를 담아 감정마다 미리 정해 둔 고정 문구입니다.
     var weeklyFeedback: String {
         switch self {
         case .joy: "이번 주는 웃음과 기쁨이 가득했구나. 이 순간을 마음껏 누리고 행복을 온전히 만끽해 줘."
@@ -13,6 +16,9 @@ extension Emotion {
         }
     }
 
+    /// 월간 통계에서 가장 많이 기록한 감정에 맞춰 보여 주는 한마디입니다.
+    ///
+    /// 공감과 격려를 담아 감정마다 미리 정해 둔 고정 문구입니다.
     var monthlyFeedback: String {
         switch self {
         case .joy: "이번 달은 유독 반짝이는 기쁨이 많았구나. 일상의 행복을 놓치지 않고 잘 발견해 낸 나에게 고마워하고, 이 따뜻한 에너지를 마음 깊숙이 저장해 줘."

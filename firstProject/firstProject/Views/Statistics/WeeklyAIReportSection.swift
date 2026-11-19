@@ -1,8 +1,14 @@
 import SwiftUI
 
+/// 주간 AI 회고 리포트 영역입니다.
+///
+/// 분석 상태에 따라 시작 카드, 로딩, 오류 안내, 6단계 결과를 보여 줍니다.
 struct WeeklyAIReportSection: View {
+    /// 현재 분석 상태입니다.
     let state: WeeklyAnalysisState
+    /// 결과 아이콘 배경에 쓸 강조 감정입니다.
     let accentEmotion: Emotion
+    /// 분석 시작 또는 다시 분석 버튼을 눌렀을 때 실행할 동작입니다.
     let onAnalyze: () -> Void
 
     var body: some View {

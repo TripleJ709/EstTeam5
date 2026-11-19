@@ -1,7 +1,9 @@
 import SwiftData
 import SwiftUI
 
+/// 회고 한 건의 상세 화면입니다. 본문 전체를 보여 주고, 편집과 삭제를 할 수 있습니다.
 struct RetrospectiveDetailView: View {
+    /// 보여 줄 회고입니다.
     let retrospective: Retrospective
 
     @Environment(\.modelContext) private var modelContext

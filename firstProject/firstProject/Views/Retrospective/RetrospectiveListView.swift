@@ -1,6 +1,10 @@
 import SwiftData
 import SwiftUI
 
+/// 회고(달력) 탭의 첫 화면입니다.
+///
+/// 월간 감정 달력, 그 달의 요약, 선택한 날짜의 회고 목록을 보여 줍니다.
+/// 회고 작성 화면으로 이동하고, 상단 버튼으로 테마를 고를 수 있습니다.
 struct RetrospectiveListView: View {
     @Query(sort: \Retrospective.date, order: .reverse)
     private var retrospectives: [Retrospective]

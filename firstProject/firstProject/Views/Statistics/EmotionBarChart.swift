@@ -1,7 +1,13 @@
 import SwiftUI
 
+/// 감정별 기록 횟수를 보여 주는 막대 그래프입니다.
+///
+/// 7가지 감정을 항상 보여 주고, 기록이 없는 감정은 흐리게 표시합니다.
+/// 막대 높이는 가장 많은 횟수를 기준으로 한 비율입니다.
 struct EmotionBarChart: View {
+    /// 그래프에 보여 줄 감정별 횟수입니다.
     let items: [EmotionCount]
+    /// 굵게 강조할 감정입니다. 보통 가장 많이 기록한 감정입니다.
     let highlighted: Emotion?
 
     private enum Metric {
