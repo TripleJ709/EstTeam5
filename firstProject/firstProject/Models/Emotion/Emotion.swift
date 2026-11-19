@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 enum Emotion: String, CaseIterable, Identifiable, Decodable {
     case joy
@@ -24,4 +24,7 @@ enum Emotion: String, CaseIterable, Identifiable, Decodable {
         case .exhausted: return "소진"
         }
     }
+
+    var auraStart: Color { Color("\(rawValue)AuraStart") }
+    var auraEnd: Color { Color("\(rawValue)AuraEnd") }
 }

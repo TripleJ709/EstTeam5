@@ -10,7 +10,7 @@ struct MainTabView: View {
             StatisticsView()
                 .tabItem { Label("통계", systemImage: "chart.bar") }
         }
-        .tint(FeeloColor.tint)
+        .tint(Color.tintPrimary)
     }
 }
 

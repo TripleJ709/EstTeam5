@@ -20,7 +20,7 @@ struct StatisticsEmptyState: View {
         VStack(spacing: Metric.spacing) {
             Circle()
                 .strokeBorder(
-                    FeeloColor.borderDashed,
+                    Color.borderDashed,
                     style: StrokeStyle(lineWidth: Metric.iconLineWidth, dash: Metric.iconDash)
                 )
                 .frame(width: iconSize, height: iconSize)
@@ -28,19 +28,19 @@ struct StatisticsEmptyState: View {
 
             Text(title)
                 .font(.headline.weight(.medium))
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .padding(.top, Metric.titleTopPadding)
 
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
         .padding(.top, Metric.top)
         .padding(.bottom, Metric.bottom)
         .padding(.horizontal, Metric.horizontal)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.chart))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 28))
         .accessibilityElement(children: .combine)
     }
 }
@@ -48,5 +48,5 @@ struct StatisticsEmptyState: View {
 #Preview {
     StatisticsEmptyState(title: "이 달에는 기록이 없어요", message: "회고를 남기면 감정 흐름과 분포가 채워져요")
         .padding(16)
-        .background(FeeloColor.bgApp)
+        .background(Color.bgApp)
 }

@@ -33,7 +33,7 @@ struct EmotionBarChart: View {
             }
         }
         .padding(Metric.padding)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.chart))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 28))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("감정 분포")
@@ -47,13 +47,13 @@ struct EmotionBarChart: View {
         return VStack(spacing: Metric.labelSpacing) {
             Text("\(count)")
                 .font(.footnote.weight(isHighlighted ? .medium : .regular))
-                .foregroundStyle(isEmpty ? FeeloColor.textSecondary : FeeloColor.textPrimary)
+                .foregroundStyle(isEmpty ? Color.textSecondary : Color.textPrimary)
 
             bar(emotion: emotion, count: count)
 
             Text(emotion.displayName)
                 .font(.footnote.weight(isHighlighted ? .medium : .regular))
-                .foregroundStyle(isHighlighted ? FeeloColor.textPrimary : FeeloColor.textSecondary)
+                .foregroundStyle(isHighlighted ? Color.textPrimary : Color.textSecondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
@@ -94,5 +94,5 @@ struct EmotionBarChart: View {
         highlighted: .achievement
     )
     .padding(16)
-    .background(FeeloColor.bgApp)
+    .background(Color.bgApp)
 }

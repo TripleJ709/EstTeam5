@@ -27,16 +27,16 @@ struct StatisticsFeedbackCard: View {
             VStack(alignment: .leading, spacing: Metric.textSpacing) {
                 Text(title)
                     .font(.footnote)
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
                 Text(message)
                     .font(.subheadline)
-                    .foregroundStyle(FeeloColor.textPrimary)
+                    .foregroundStyle(Color.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(Metric.padding)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.summary))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 24))
         .accessibilityElement(children: .combine)
     }
 }
@@ -50,7 +50,7 @@ struct StatisticsFeedbackCard: View {
         }
         .padding(16)
     }
-    .background(FeeloColor.bgApp)
+    .background(Color.bgApp)
 }
 
 #Preview("월간") {
@@ -62,5 +62,5 @@ struct StatisticsFeedbackCard: View {
         }
         .padding(16)
     }
-    .background(FeeloColor.bgApp)
+    .background(Color.bgApp)
 }

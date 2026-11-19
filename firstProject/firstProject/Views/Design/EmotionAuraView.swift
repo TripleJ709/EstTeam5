@@ -35,7 +35,7 @@ struct EmotionAuraView: View {
         ForEach(Emotion.allCases) { EmotionAuraView(emotion: $0, size: 40) }
     }
     .padding()
-    .background(FeeloColor.bgApp)
+    .background(Color.bgApp)
 }
 
 struct EmotionWash: View {

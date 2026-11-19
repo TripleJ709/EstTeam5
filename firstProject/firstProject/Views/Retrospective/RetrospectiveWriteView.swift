@@ -34,7 +34,7 @@ struct RetrospectiveWriteView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            FeeloColor.bgApp.ignoresSafeArea()
+            Color.bgApp.ignoresSafeArea()
 
             if let emotion = draft.emotion {
                 EmotionWash(emotion: emotion, opacity: 0.55, blur: 30)
@@ -78,10 +78,10 @@ struct RetrospectiveWriteView: View {
                 .disabled(!draft.canSave)
             }
         }
-        .tint(FeeloColor.tint)
+        .tint(Color.tintPrimary)
         .presentationDetents([.large])
         .presentationCornerRadius(38)
-        .presentationBackground(FeeloColor.bgApp)
+        .presentationBackground(Color.bgApp)
     }
 
     private var dateSection: some View {
@@ -98,11 +98,11 @@ struct RetrospectiveWriteView: View {
                 datePicker
             }
         }
-        .foregroundStyle(FeeloColor.textPrimary)
+        .foregroundStyle(Color.textPrimary)
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 26))
         .padding(.top, 8)
     }
 
@@ -125,11 +125,11 @@ struct RetrospectiveWriteView: View {
                 }
             }
             .padding(12)
-            .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+            .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 26))
 
             Text("오늘 하루를 가장 잘 나타내는 감정을 하나 골라 주세요.")
                 .font(.footnote)
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
                 .padding(.horizontal, 16)
         }
     }
@@ -142,7 +142,7 @@ struct RetrospectiveWriteView: View {
             VStack(alignment: .trailing, spacing: 8) {
                 TextEditor(text: $draft.content)
                     .font(.body)
-                    .foregroundStyle(FeeloColor.textPrimary)
+                    .foregroundStyle(Color.textPrimary)
                     .scrollContentBackground(.hidden)
                     .frame(minHeight: 120)
                     .onChange(of: draft.content) {
@@ -151,11 +151,11 @@ struct RetrospectiveWriteView: View {
 
                 Text("\(draft.content.count) / \(RetrospectiveDraft.maxLength)")
                     .font(.footnote)
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.card))
+            .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 26))
         }
     }
 
@@ -192,24 +192,24 @@ struct RetrospectiveWriteView: View {
         case .recommended(let emotion):
             if draft.emotion == emotion {
                 Text("AI가 \(emotion.displayName) 감정을 추천했어요. 위에서 직접 바꿀 수도 있어요.")
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
             } else {
                 Text("")
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
             }
         case .failed(let message):
             Text(message)
-                .foregroundStyle(FeeloColor.destructive)
+                .foregroundStyle(Color.statusDestructive)
         default:
             Text("")
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
         }
     }
 
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(FeeloColor.textSecondary)
+            .foregroundStyle(Color.textSecondary)
             .padding(.horizontal, 16)
     }
 
@@ -269,7 +269,7 @@ private struct EmotionPickerCard: View {
                 EmotionAuraView(emotion: emotion, size: 36)
                 Text(emotion.displayName)
                     .font(.footnote)
-                    .foregroundStyle(FeeloColor.textPrimary)
+                    .foregroundStyle(Color.textPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
@@ -277,13 +277,13 @@ private struct EmotionPickerCard: View {
             .padding(.bottom, 10)
             .frame(maxWidth: .infinity)
             .background(
-                isSelected ? FeeloColor.bgSelected : FeeloColor.bgApp,
-                in: RoundedRectangle(cornerRadius: FeeloRadius.control)
+                isSelected ? Color.bgSelected : Color.bgApp,
+                in: RoundedRectangle(cornerRadius: 20)
             )
             .overlay {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: FeeloRadius.control)
-                        .strokeBorder(FeeloColor.tint, lineWidth: 2)
+                    RoundedRectangle(cornerRadius: 20)
+                        .strokeBorder(Color.tintPrimary, lineWidth: 2)
                 }
             }
         }

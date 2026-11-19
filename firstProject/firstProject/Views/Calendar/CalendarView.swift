@@ -35,7 +35,7 @@ struct CalendarView: View {
         }
         .padding(.horizontal, 11)
         .padding(.vertical, 10)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.calendar))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 28))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
@@ -47,7 +47,7 @@ struct CalendarView: View {
             ForEach(ordered.indices, id: \.self) { index in
                 Text(ordered[index])
                     .font(.footnote.weight(.medium))
-                    .foregroundStyle(FeeloColor.textSecondary)
+                    .foregroundStyle(Color.textSecondary)
                     .frame(height: 20)
             }
         }
@@ -98,7 +98,7 @@ private struct DayCell: View {
             VStack(spacing: 4) {
                 Text("\(day)")
                     .font(isEmphasized ? .body.weight(.medium) : .callout)
-                    .foregroundStyle(isEmphasized ? FeeloColor.tint : FeeloColor.textPrimary)
+                    .foregroundStyle(isEmphasized ? Color.tintPrimary : Color.textPrimary)
                     .opacity(isOutside ? 0.35 : 1)
                 markerView
             }
@@ -106,8 +106,8 @@ private struct DayCell: View {
             .frame(maxWidth: .infinity)
             .frame(height: cellHeight)
             .background(
-                isSelected && !isOutside ? FeeloColor.bgSelected : .clear,
-                in: RoundedRectangle(cornerRadius: FeeloRadius.cell)
+                isSelected && !isOutside ? Color.bgSelected : .clear,
+                in: RoundedRectangle(cornerRadius: 14)
             )
             .contentShape(Rectangle())
         }
@@ -123,7 +123,7 @@ private struct DayCell: View {
             EmotionAuraView(emotion: emotion, size: markerSize)
         case .missed:
             Circle()
-                .strokeBorder(FeeloColor.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                .strokeBorder(Color.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
                 .frame(width: markerSize, height: markerSize)
         case .none:
             Color.clear.frame(width: markerSize, height: markerSize)
@@ -145,5 +145,5 @@ private struct DayCell: View {
     @Previewable @State var selected = Date.now
     CalendarView(month: .now, retrospectives: [], selectedDate: $selected)
         .padding(16)
-        .background(FeeloColor.bgApp)
+        .background(Color.bgApp)
 }

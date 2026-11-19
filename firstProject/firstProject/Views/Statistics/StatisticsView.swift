@@ -39,14 +39,14 @@ struct StatisticsView: View {
             .background { screenBackground }
             .navigationTitle("감정 돌아보기")
         }
-        .tint(FeeloColor.tint)
+        .tint(Color.tintPrimary)
         .onChange(of: anchorDate) { weeklyAnalysis.reset() }
         .onChange(of: period) { weeklyAnalysis.reset() }
     }
 
     private var screenBackground: some View {
         ZStack(alignment: .top) {
-            FeeloColor.bgApp
+            Color.bgApp
 
             if let top = topEmotion {
                 EmotionWash(emotion: top, opacity: 0.55, blur: 30)
@@ -80,7 +80,7 @@ struct StatisticsView: View {
         HStack(spacing: 0) {
             Text(period.title(of: anchorDate))
                 .font(.title3.weight(.medium))
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             navigationButton(systemName: "chevron.left", label: "이전", offset: -1)
@@ -97,7 +97,7 @@ struct StatisticsView: View {
         } label: {
             Image(systemName: systemName)
                 .font(.title3.weight(.medium))
-                .foregroundStyle(FeeloColor.tint)
+                .foregroundStyle(Color.tintPrimary)
                 .frame(width: 44, height: 44)
         }
         .accessibilityLabel(label)
@@ -133,7 +133,7 @@ struct StatisticsView: View {
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(FeeloColor.textSecondary)
+            .foregroundStyle(Color.textSecondary)
             .padding(.horizontal, 16)
             .padding(.top, 8)
     }
@@ -150,7 +150,7 @@ private struct StatCard: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.footnote)
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
             HStack(spacing: 8) {
                 if let emotion {
                     EmotionAuraView(emotion: emotion, size: auraSize)
@@ -158,12 +158,12 @@ private struct StatCard: View {
                 Text(value)
             }
             .font(.title3.bold())
-            .foregroundStyle(FeeloColor.textPrimary)
+            .foregroundStyle(Color.textPrimary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(FeeloColor.bgCard, in: RoundedRectangle(cornerRadius: FeeloRadius.summary))
+        .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 24))
         .accessibilityElement(children: .combine)
     }
 }

@@ -32,7 +32,7 @@ struct WelcomeView: View {
             startButton
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
-                .background(FeeloColor.bgApp.ignoresSafeArea(edges: .bottom))
+                .background(Color.bgApp.ignoresSafeArea(edges: .bottom))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(alignment: .topLeading) { background }
@@ -40,7 +40,7 @@ struct WelcomeView: View {
 
     private var background: some View {
         ZStack(alignment: .topLeading) {
-            FeeloColor.bgApp
+            Color.bgApp
 
             Circle()
                 .fill(
@@ -97,19 +97,19 @@ struct WelcomeView: View {
             Text("Feelo")
                 .font(.system(size: logoSize, weight: .bold))
                 .tracking(-1)
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
             Text("오늘의 감정을 색으로 남겨요")
                 .font(.title2.bold())
-                .foregroundStyle(FeeloColor.textPrimary)
+                .foregroundStyle(Color.textPrimary)
 
             Text("짧게 쓰고 감정을 고르면,\n한 달이 색으로 이어져요.")
                 .font(.body)
                 .lineSpacing(0)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(FeeloColor.textSecondary)
+                .foregroundStyle(Color.textSecondary)
         }
     }
 
@@ -117,11 +117,11 @@ struct WelcomeView: View {
         Button(action: onStart) {
             Text("시작하기")
                 .font(.body.weight(.medium))
-                .foregroundStyle(FeeloColor.onTint)
+                .foregroundStyle(Color.tintOnPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .frame(minHeight: 52)
-                .background(FeeloColor.tint, in: Capsule())
+                .background(Color.tintPrimary, in: Capsule())
         }
     }
 }
