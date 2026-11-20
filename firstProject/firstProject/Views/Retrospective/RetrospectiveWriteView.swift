@@ -34,15 +34,15 @@ struct RetrospectiveWriteView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            Color.bgApp.ignoresSafeArea()
-
-            if let emotion = draft.emotion {
-                EmotionWash(emotion: emotion, opacity: 0.55, blur: 30)
-                    .frame(maxWidth: .infinity)
-                    .offset(y: -200)
-                    .ignoresSafeArea()
-                    .animation(.easeInOut(duration: 0.25), value: draft.emotion)
-            }
+            Color.bgApp
+                .overlay(alignment: .top) {
+                    if let emotion = draft.emotion {
+                        EmotionWash(emotion: emotion, opacity: 0.55, blur: 30)
+                            .offset(y: -200)
+                            .animation(.easeInOut(duration: 0.25), value: draft.emotion)
+                    }
+                }
+                .ignoresSafeArea()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
@@ -57,7 +57,7 @@ struct RetrospectiveWriteView: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .onDisappear { recommendTask?.cancel() }
-        .navigationTitle(retrospective == nil ? "새 회고" : "회고 편집")
+        .navigationTitle(retrospective == nil ? "새 감정" : "감정 편집")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
