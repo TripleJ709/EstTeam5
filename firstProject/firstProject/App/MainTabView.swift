@@ -5,10 +5,10 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             RetrospectiveListView()
-                .tabItem { Label("회고", systemImage: "calendar") }
+                .tabItem { Label("달력", systemImage: "calendar") }
 
             StatisticsView()
-                .tabItem { Label("통계", systemImage: "chart.bar") }
+                .tabItem { Label("기록", systemImage: "chart.bar") }
         }
         .tint(Color.tintPrimary)
     }

@@ -8,7 +8,6 @@ struct RetrospectiveListView: View {
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
-    @State private var isShowingThemeAlert = false
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
 
     private var calendar: Calendar { .current }
@@ -38,13 +37,17 @@ struct RetrospectiveListView: View {
                 .padding(.bottom, 24)
             }
             .background(Color.bgApp.ignoresSafeArea())
-            .navigationTitle("회고")
+            .navigationTitle("이 달의 감정")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        isShowingThemeAlert = true
+                    Menu {
+                        Picker("테마", selection: $appTheme) {
+                            ForEach(AppTheme.allCases) { theme in
+                                Text(theme.title).tag(theme)
+                            }
+                        }
                     } label: {
-                        Image(systemName: "gearshape")
+                        Image(systemName: "circle.lefthalf.filled")
                             .accessibilityLabel("테마 설정")
                     }
                     .tint(Color.tintPrimary)
@@ -60,16 +63,6 @@ struct RetrospectiveListView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(Color.tintPrimary)
                 }
-            }
-            .alert("테마", isPresented: $isShowingThemeAlert) {
-                ForEach(AppTheme.allCases) { theme in
-                    Button(theme.title) {
-                        appTheme = theme
-                    }
-                }
-                Button("취소", role: .cancel) {}
-            } message: {
-                Text("현재 설정: \(appTheme.title)")
             }
             .sheet(item: $writeRequest) { request in
                 NavigationStack {
