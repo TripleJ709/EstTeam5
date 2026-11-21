@@ -9,6 +9,7 @@ struct RetrospectiveListView: View {
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var calendar: Calendar { .current }
     private var today: Date { .now }
@@ -29,10 +30,19 @@ struct RetrospectiveListView: View {
                         .padding(.top, -6)
 
                     monthNavigation
-                    CalendarView(month: displayedMonth, retrospectives: retrospectives, selectedDate: $selectedDate)
-                        .padding(.horizontal, 16)
-                    legend
-                    selectedDayPreview
+                    if typeSize.isAccessibilitySize {
+                        // 아주 큰 글씨: 달력 대신 날짜별 목록, 기록이 없으면 빈 카드
+                        if monthItems.isEmpty {
+                            selectedDayPreview
+                        } else {
+                            DayListView(items: monthItems)
+                        }
+                    } else {
+                        CalendarView(month: displayedMonth, retrospectives: retrospectives, selectedDate: $selectedDate)
+                            .padding(.horizontal, 16)
+                        legend
+                        selectedDayPreview
+                    }
                 }
                 .padding(.bottom, 24)
             }
@@ -187,6 +197,11 @@ struct RetrospectiveListView: View {
         retrospectives
             .filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
             .sorted { $0.createdAt > $1.createdAt }
+    }
+
+    // 보고 있는 달의 회고 (최신순, @Query에서 이미 정렬됨)
+    private var monthItems: [Retrospective] {
+        retrospectives.filter { calendar.isDate($0.date, equalTo: displayedMonth, toGranularity: .month) }
     }
 
     private var isSelectedToday: Bool { calendar.isDate(selectedDate, inSameDayAs: today) }
