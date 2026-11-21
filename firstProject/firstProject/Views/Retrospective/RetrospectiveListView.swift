@@ -8,8 +8,8 @@ struct RetrospectiveListView: View {
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
     @State private var writeRequest: WriteRequest?
-    @State private var isShowingThemeAlert = false
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var calendar: Calendar { .current }
     private var today: Date { .now }
@@ -30,21 +30,34 @@ struct RetrospectiveListView: View {
                         .padding(.top, -6)
 
                     monthNavigation
-                    CalendarView(month: displayedMonth, retrospectives: retrospectives, selectedDate: $selectedDate)
-                        .padding(.horizontal, 16)
-                    legend
-                    selectedDayPreview
+                    if typeSize.isAccessibilitySize {
+                        // 아주 큰 글씨: 달력 대신 날짜별 목록, 기록이 없으면 빈 카드
+                        if monthItems.isEmpty {
+                            selectedDayPreview
+                        } else {
+                            DayListView(items: monthItems)
+                        }
+                    } else {
+                        CalendarView(month: displayedMonth, retrospectives: retrospectives, selectedDate: $selectedDate)
+                            .padding(.horizontal, 16)
+                        legend
+                        selectedDayPreview
+                    }
                 }
                 .padding(.bottom, 24)
             }
             .background(Color.bgApp.ignoresSafeArea())
-            .navigationTitle("회고")
+            .navigationTitle("이 달의 감정")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        isShowingThemeAlert = true
+                    Menu {
+                        Picker("테마", selection: $appTheme) {
+                            ForEach(AppTheme.allCases) { theme in
+                                Text(theme.title).tag(theme)
+                            }
+                        }
                     } label: {
-                        Image(systemName: "gearshape")
+                        Image(systemName: "circle.lefthalf.filled")
                             .accessibilityLabel("테마 설정")
                     }
                     .tint(Color.tintPrimary)
@@ -60,16 +73,6 @@ struct RetrospectiveListView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(Color.tintPrimary)
                 }
-            }
-            .alert("테마", isPresented: $isShowingThemeAlert) {
-                ForEach(AppTheme.allCases) { theme in
-                    Button(theme.title) {
-                        appTheme = theme
-                    }
-                }
-                Button("취소", role: .cancel) {}
-            } message: {
-                Text("현재 설정: \(appTheme.title)")
             }
             .sheet(item: $writeRequest) { request in
                 NavigationStack {
@@ -194,6 +197,11 @@ struct RetrospectiveListView: View {
         retrospectives
             .filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
             .sorted { $0.createdAt > $1.createdAt }
+    }
+
+    // 보고 있는 달의 회고 (최신순, @Query에서 이미 정렬됨)
+    private var monthItems: [Retrospective] {
+        retrospectives.filter { calendar.isDate($0.date, equalTo: displayedMonth, toGranularity: .month) }
     }
 
     private var isSelectedToday: Bool { calendar.isDate(selectedDate, inSameDayAs: today) }
