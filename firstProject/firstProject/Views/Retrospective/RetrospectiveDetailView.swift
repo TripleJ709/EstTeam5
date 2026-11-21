@@ -43,8 +43,8 @@ struct RetrospectiveDetailView: View {
                 RetrospectiveWriteView(retrospective: retrospective)
             }
         }
-        .confirmationDialog("이 회고를 삭제할까요?", isPresented: $isConfirmingDelete, titleVisibility: .visible) {
-            Button("회고 삭제", role: .destructive) {
+        .alert("이 회고를 삭제할까요?", isPresented: $isConfirmingDelete) {
+            Button("삭제", role: .destructive) {
                 modelContext.delete(retrospective)
                 dismiss()
             }
