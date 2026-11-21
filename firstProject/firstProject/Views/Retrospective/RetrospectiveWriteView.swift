@@ -9,6 +9,8 @@ struct RetrospectiveWriteView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     @State private var draft: RetrospectiveDraft
+    @State private var originalDraft: RetrospectiveDraft
+    @State private var isConfirmingDiscard = false
     @State private var recommendation: RecommendationState = .idle
     @State private var recommendTask: Task<Void, Never>?
 
@@ -25,11 +27,19 @@ struct RetrospectiveWriteView: View {
 
     init(retrospective: Retrospective? = nil, date: Date? = nil) {
         self.retrospective = retrospective
+        let initialDraft: RetrospectiveDraft
         if let retrospective {
-            _draft = State(initialValue: RetrospectiveDraft(retrospective))
+            initialDraft = RetrospectiveDraft(retrospective)
         } else {
-            _draft = State(initialValue: RetrospectiveDraft(date: date ?? .now))
+            initialDraft = RetrospectiveDraft(date: date ?? .now)
         }
+        _draft = State(initialValue: initialDraft)
+        _originalDraft = State(initialValue: initialDraft)
+    }
+
+    // 화면을 열었을 때와 내용이 달라졌으면 true
+    private var hasChanges: Bool {
+        draft != originalDraft
     }
 
     var body: some View {
@@ -62,7 +72,11 @@ struct RetrospectiveWriteView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button {
-                    dismiss()
+                    if hasChanges {
+                        isConfirmingDiscard = true
+                    } else {
+                        dismiss()
+                    }
                 } label: {
                     Image(systemName: "xmark")
                         .accessibilityLabel("닫기")
@@ -78,6 +92,15 @@ struct RetrospectiveWriteView: View {
                 .disabled(!draft.canSave)
             }
         }
+        .alert("작성 중인 회고가 있어요", isPresented: $isConfirmingDiscard) {
+            Button("변경 사항 버리기", role: .destructive) {
+                dismiss()
+            }
+            Button("계속 작성하기", role: .cancel) {}
+        } message: {
+            Text("닫으면 입력한 내용이 사라져요.")
+        }
+        .interactiveDismissDisabled(hasChanges)
         .tint(Color.tintPrimary)
         .presentationDetents([.large])
         .presentationCornerRadius(38)
