@@ -1,12 +1,20 @@
 import SwiftUI
 
+/// AI 주간 회고 리포트 영역입니다.
+///
+/// 분석 상태에 따라 분석 시작 카드, 로딩 상태, 오류 메시지가 있는 카드, 분석 결과 카드를 보여줍니다.
 struct WeeklyAIReportSection: View {
+    /// 주간 분석의 현재 상태입니다.
     let state: WeeklyAnalysisState
+    /// 리포트 아이콘 배경 색에 사용할 감정입니다.
     let accentEmotion: Emotion
+    /// 분석 시작 또는 다시 분석 버튼을 눌렀을 때 실행하는 클로저입니다.
     let onAnalyze: () -> Void
 
+    /// AI 아이콘의 크기입니다. `.title3` 글꼴 크기에 맞춰 조정됩니다.
     @ScaledMetric(relativeTo: .title3) private var aiIconSize: CGFloat = 20
 
+    /// 화면 구성
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader
@@ -25,6 +33,7 @@ struct WeeklyAIReportSection: View {
         .padding(.horizontal, 16)
     }
 
+    /// "AI 주간 회고 리포트" 제목을 보여주는 헤더입니다. 분석 결과가 있으면 "다시 분석" 버튼도 표시합니다.
     private var sectionHeader: some View {
         HStack {
             Text("AI 주간 회고 리포트")
@@ -45,6 +54,12 @@ struct WeeklyAIReportSection: View {
         .padding(.top, 8)
     }
 
+    /// 분석 안내 문구와 시작 버튼을 보여주는 카드를 만듭니다.
+    ///
+    /// - Parameters:
+    ///   - isLoading: 분석 중인지 여부입니다. `true`이면 진행 표시와 함께 버튼이 비활성화됩니다.
+    ///   - errorMessage: 표시할 오류 메시지입니다. `nil`이면 표시하지 않습니다.
+    /// - Returns: 분석 시작 카드 뷰입니다.
     private func promptCard(isLoading: Bool, errorMessage: String?) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
@@ -92,6 +107,10 @@ struct WeeklyAIReportSection: View {
         .background(Color.bgCard, in: RoundedRectangle(cornerRadius: 24))
     }
 
+    /// 분석 결과의 사고 단계들을 나열하는 카드를 만듭니다.
+    ///
+    /// - Parameter analysis: 표시할 주간 분석 결과입니다.
+    /// - Returns: 단계별 행으로 구성된 카드 뷰입니다.
     private func reportCard(_ analysis: WeeklyReflectionAnalysis) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach(analysis.thinkingSteps) { step in
@@ -103,11 +122,16 @@ struct WeeklyAIReportSection: View {
     }
 }
 
+/// 분석 결과의 사고 단계 하나를 아이콘, 제목, 내용으로 보여주는 행입니다.
 private struct ThinkingStepRow: View {
+    /// 표시할 사고 단계입니다.
     let step: WeeklyReflectionAnalysis.ThinkingStep
+    /// 아이콘 배경 그라데이션에 사용할 감정입니다.
     let accentEmotion: Emotion
 
+    /// 단계에 맞는 아이콘이 없을 때 사용하는 SF Symbol 이름입니다.
     private static let fallbackIcon = "circle"
+    /// 단계 식별자별 SF Symbol 이름 표입니다.
     private static let icons = [
         "facts": "doc.text",
         "emotionalFlow": "waveform.path.ecg",
@@ -117,6 +141,7 @@ private struct ThinkingStepRow: View {
         "summary": "quote.opening"
     ]
 
+    /// 화면 구성
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: Self.icons[step.id] ?? Self.fallbackIcon)
