@@ -70,14 +70,14 @@
 | 회고 작성·편집 | `Views/Retrospective/RetrospectiveWriteView.swift` | 날짜·감정 선택, 500자 입력, AI 감정 추천 |
 | 회고 상세 | `Views/Retrospective/RetrospectiveDetailView.swift` | 회고 전문 열람, 편집 시트 및 삭제 확인 |
 | 통계 | `Views/Statistics/StatisticsView.swift` | 주간/월간 전환, 요약 카드, 감정 흐름, 분포 차트 |
-| 디자인 시스템 | `Views/Design/FeeloTokens.swift`<br>`Views/Design/EmotionAuraView.swift` | 브랜드 컬러·반경 토큰 및 아우라 구슬 컴포넌트 |
+| 디자인 시스템 | `Views/Design/EmotionAuraView.swift` | 브랜드 컬러·반경 토큰 및 아우라 구슬 컴포넌트 |
 
 ```text
 firstProject/
 ├── App/          # 앱 진입점(firstProjectApp), 탭 구성(MainTabView)
-├── Models/       # SwiftData 모델(Retrospective), Emotion 열거형 및 드래프트
-├── Services/     # OpenAI 추천(EmotionRecommender), 설정(AppConfig), 디버그 시드(DebugSample)
-└── Views/        # Onboarding, Calendar, Retrospective, Statistics, Design
+├── Models/       # SwiftData 모델(Retrospective), Emotion 열거형 및 드래프트, Statistics
+├── Services/     # OpenAI 추천(EmotionRecommender), 설정(AppConfig), OpenAiClient, WeeklyReflecionAnalyzer
+└── Views/        # Onboarding, Calendar, Retrospective, Statistics, Design, Settings
 ```
 
 ## 🔧 5. 2일차 피드백 반영 및 추후 확장 계획
