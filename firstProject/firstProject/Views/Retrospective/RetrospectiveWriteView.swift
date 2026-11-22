@@ -7,6 +7,7 @@ struct RetrospectiveWriteView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .body) private var aiIconSize: CGFloat = 20
 
     @State private var draft: RetrospectiveDraft
     @State private var originalDraft: RetrospectiveDraft
@@ -191,7 +192,11 @@ struct RetrospectiveWriteView: View {
                     if recommendation == .loading {
                         ProgressView()
                     } else {
-                        Image(systemName: "sparkles")
+                        Image(decorative: "iconAI")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: aiIconSize, height: aiIconSize)
                     }
                     Text(recommendation == .loading ? "감정을 분석하는 중" : "AI로 감정 추천받기")
                 }

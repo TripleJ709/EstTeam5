@@ -5,6 +5,8 @@ struct WeeklyAIReportSection: View {
     let accentEmotion: Emotion
     let onAnalyze: () -> Void
 
+    @ScaledMetric(relativeTo: .title3) private var aiIconSize: CGFloat = 20
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader
@@ -46,8 +48,11 @@ struct WeeklyAIReportSection: View {
     private func promptCard(isLoading: Bool, errorMessage: String?) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
-                Image(systemName: "sparkles")
-                    .font(.title3)
+                Image(decorative: "iconAI")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: aiIconSize, height: aiIconSize)
                     .foregroundStyle(Color.tintPrimary)
 
                 VStack(alignment: .leading, spacing: 2) {
