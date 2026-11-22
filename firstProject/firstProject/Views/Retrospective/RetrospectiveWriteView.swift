@@ -12,6 +12,7 @@ struct RetrospectiveWriteView: View {
     @State private var draft: RetrospectiveDraft
     @State private var originalDraft: RetrospectiveDraft
     @State private var isConfirmingDiscard = false
+    @State private var isShowingDatePicker = false
     @State private var recommendation: RecommendationState = .idle
     @State private var recommendTask: Task<Void, Never>?
 
@@ -130,10 +131,31 @@ struct RetrospectiveWriteView: View {
         .padding(.top, 8)
     }
 
+    // 기본(compact) DatePicker는 다른 날짜를 고르면 달력 숫자 칸이 살짝 넓어져서
+    // 날짜 버튼 + popover 안의 달력(graphical)으로 직접 띄움
     private var datePicker: some View {
-        DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
-            .labelsHidden()
-            .environment(\.locale, .korean)
+        Button {
+            isShowingDatePicker = true
+        } label: {
+            Text(draft.date.formatted(.dateTime.year().month(.defaultDigits).day().locale(.korean)))
+                .monospacedDigit()
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color(.tertiarySystemFill), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("날짜")
+        .accessibilityValue(draft.date.formatted(.dateTime.year().month().day().locale(.korean)))
+        .popover(isPresented: $isShowingDatePicker) {
+            DatePicker("날짜", selection: $draft.date, in: ...Date.now, displayedComponents: .date)
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+                .environment(\.locale, .korean)
+                // 7칸이 정수(46pt)로 나눠지는 폭: 소수점 폭이면 처음 열 때와 날짜를 고른 뒤 칸 위치가 1pt쯤 달라짐
+                .frame(width: 322)
+                .padding(.horizontal, 12)
+                .presentationCompactAdaptation(.popover)
+        }
     }
 
     private var emotionSection: some View {
