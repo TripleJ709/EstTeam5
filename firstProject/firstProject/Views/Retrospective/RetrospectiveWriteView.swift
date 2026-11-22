@@ -58,8 +58,8 @@ struct RetrospectiveWriteView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     dateSection
                     emotionSection
-                    contentSection
                     recommendSection
+                    contentSection
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 40)
