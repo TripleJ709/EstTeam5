@@ -5,7 +5,6 @@ struct CalendarView: View {
     let retrospectives: [Retrospective]
     @Binding var selectedDate: Date
     var today: Date = .now
-    var installDate: Date = AppConfig.installDate
 
     private var calendar: Calendar {
         var calendar = Calendar.current
@@ -69,16 +68,12 @@ struct CalendarView: View {
         if let latest = Retrospective.latest(in: retrospectives, on: date, calendar: calendar) {
             return .emotion(latest.emotion)
         }
-        let day = calendar.startOfDay(for: date)
-        if day < calendar.startOfDay(for: today), day >= calendar.startOfDay(for: installDate) {
-            return .missed
-        }
         return .none
     }
 }
 
 private struct DayCell: View {
-    enum Marker: Equatable { case none, missed, emotion(Emotion) }
+    enum Marker: Equatable { case none, emotion(Emotion) }
 
     let date: Date
     let day: Int
@@ -121,10 +116,6 @@ private struct DayCell: View {
         switch marker {
         case .emotion(let emotion):
             EmotionAuraView(emotion: emotion, size: markerSize)
-        case .missed:
-            Circle()
-                .strokeBorder(Color.borderDashed, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                .frame(width: markerSize, height: markerSize)
         case .none:
             Color.clear.frame(width: markerSize, height: markerSize)
         }
@@ -135,7 +126,6 @@ private struct DayCell: View {
             + date.formatted(.dateTime.month().day().locale(.korean))
         switch marker {
         case .emotion(let emotion): return "\(dateText), \(emotion.displayName)"
-        case .missed: return "\(dateText), 기록 없음"
         case .none: return dateText
         }
     }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct RetrospectiveDraft {
+struct RetrospectiveDraft: Equatable {
     static let maxLength = 500
 
     var date: Date
