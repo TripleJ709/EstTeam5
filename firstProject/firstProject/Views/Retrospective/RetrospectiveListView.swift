@@ -23,11 +23,14 @@ struct RetrospectiveListView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(monthSummary)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.textSecondary)
-                        .padding(.horizontal, 16)
-                        .padding(.top, -6)
+                    // 아주 큰 글씨에서는 요약 문구를 숨김 (Figma 01-AX)
+                    if !typeSize.isAccessibilitySize {
+                        Text(monthSummary)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.textSecondary)
+                            .padding(.horizontal, 16)
+                            .padding(.top, -6)
+                    }
 
                     monthNavigation
                     if typeSize.isAccessibilitySize {
