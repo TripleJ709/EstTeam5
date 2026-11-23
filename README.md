@@ -19,6 +19,27 @@
   </p>
 </div>
 
+## 대표 앱 화면
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/01-calendar.png" width="165" alt="월간 감정 달력" /></td>
+    <td align="center"><img src="docs/images/02-write.png" width="165" alt="회고 작성과 AI 감정 추천" /></td>
+    <td align="center"><img src="docs/images/03-detail.png" width="165" alt="회고 상세" /></td>
+    <td align="center"><img src="docs/images/04-statistics.png" width="165" alt="주간 통계와 AI 리포트" /></td>
+    <td align="center"><img src="docs/images/05-dark.png" width="165" alt="다크 모드" /></td>
+  </tr>
+  <tr>
+    <td valign="top" align="center"><b>월간 감정 달력</b><br/>날짜별 감정 아우라와 최다 감정 요약, 하단 범례</td>
+    <td valign="top" align="center"><b>회고 작성 · AI 추천</b><br/>감정 선택, AI 추천 감정과 이유, 500자 입력</td>
+    <td valign="top" align="center"><b>회고 상세</b><br/>감정 배경과 작성 일시, 회고 전문, 편집·삭제 메뉴</td>
+    <td valign="top" align="center"><b>주간 통계 · AI 리포트</b><br/>감정 분포 막대 그래프, 주간 한마디, 6단계 AI 리포트</td>
+    <td valign="top" align="center"><b>다크 모드</b><br/>같은 화면을 다크 테마로 표시</td>
+  </tr>
+</table>
+
+> 화면의 기록은 시연을 위해 넣은 예시 데이터입니다.
+
 ## 프로젝트 개요
 
 * **팀명:** 오졌조 (EST Team 5)
