@@ -1,111 +1,218 @@
-# Feelo — 감정 회고 앱 프로젝트 (오졌조)
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="firstProject/firstProject/Assets.xcassets/AppIcon.appiconset/AppLogo_Dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="firstProject/firstProject/Assets.xcassets/AppIcon.appiconset/AppLogo_Light.png">
+    <img src="firstProject/firstProject/Assets.xcassets/AppIcon.appiconset/AppLogo_Light.png" alt="Feelo 앱 아이콘" width="110" />
+  </picture>
 
-> **💡 프로젝트 한 줄 요약**  
-> 오늘의 회고를 짧은 글로 기록하고 7가지 감정 색(아우라)으로 남겨, 한 달과 한 주의 감정 흐름을 달력과 통계로 한눈에 확인하는 iOS 앱
+  <h1>Feelo</h1>
+  <p><strong>오늘의 감정을 색으로 남겨요</strong></p>
+  <p>하루의 회고를 짧은 글로 기록하고 7가지 감정 색(아우라)으로 남겨,<br/>한 주와 한 달의 감정 흐름을 달력과 통계, AI 리포트로 한눈에 돌아보는 iOS 감정 회고 앱</p>
 
-## 📌 1. 프로젝트 개요
+  <p>
+    <img src="https://img.shields.io/badge/Platform-iOS%2017.0%2B-000000?style=flat-square&logo=apple" alt="iOS 17.0+" />
+    <img src="https://img.shields.io/badge/Device-iPhone%20Portrait%20Only-555555?style=flat-square" alt="iPhone Portrait Only" />
+    <img src="https://img.shields.io/badge/Swift-5.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 5.0" />
+    <img src="https://img.shields.io/badge/UI-SwiftUI-007AFF?style=flat-square" alt="SwiftUI" />
+    <img src="https://img.shields.io/badge/Storage-SwiftData%20%7C%20%40AppStorage-34C759?style=flat-square" alt="SwiftData" />
+    <img src="https://img.shields.io/badge/AI-OpenAI%20API-412991?style=flat-square" alt="OpenAI API" />
+  </p>
+</div>
 
-* **진행 단계:** 핵심 기능 구현 및 UI/UX 고도화 단계 (2일차 진행 중)
-* **개발 기간:** `2026.11.16 (월)` ~ `2026.11.22 (일)` (1주)
-* **해결할 문제:** 본인의 주간·월간 감정 변화와 회고 기록을 직관적인 색의 흐름으로 한눈에 파악하고 싶은 니즈 해결
-* **대상 사용자:** 짧게 **글로 회고**하고, AI의 도움을 받아 오늘의 감정을 정리하며 자신의 감정 흐름을 돌아보고 싶은 사용자 *(※ 음성 입력 기능 제외)*
-* **기술 스택:** Swift, SwiftUI, SwiftData, Swift Charts, OpenAI Chat Completions API
-* **지원 환경:** iOS / iPhone 세로 모드 / 한국어 지원 / Dynamic Type·VoiceOver 접근성 대응 *(라이트·다크 모드 Color Set 확장 예정)*
+## 프로젝트 개요
 
-## 👥 2. 팀원 소개 및 역할 분담
+* **팀명:** 오졌조 (EST Team 5)
+* **개발 기간:** `2026.11.16 (월)` ~ `2026.11.22 (일)`
+* **기획 의도:** 하루의 회고를 부담 없이 짧은 글로 남기고, 7가지 감정 색으로 시각화하여 주간·월간 감정 흐름을 직관적으로 돌아볼 수 있도록 설계했습니다.
+* **지원 환경:**
+  * **OS:** iOS 17.0 이상
+  * **디바이스:** iPhone 세로 모드 전용 (`TARGETED_DEVICE_FAMILY = 1`, `UIInterfaceOrientationPortrait`) — iPad 및 macOS 미지원
+  * **언어:** 앱 문구는 한국어로만 제공하고 날짜 표기는 `ko_KR`로 고정합니다. (다국어 미지원)
+
+## 핵심 기능
+
+### 1. 온보딩 (`WelcomeView`)
+* 앱 최초 실행 시 `@AppStorage("hasSeenWelcome")` 값을 확인해 온보딩 화면을 표시합니다.
+* 7가지 감정 아우라 일러스트와 브랜드 로고를 배치하고, **시작하기** 버튼을 누르면 메인 탭 화면으로 전환됩니다.
+
+### 2. 회고 작성 · 열람 · 편집 · 삭제 (CRUD)
+* **작성 및 편집 (`RetrospectiveWriteView`):**
+  * 미래 날짜 선택을 제한한 팝오버 그래픽 `DatePicker`로 오늘 또는 지난 날짜의 회고를 기록할 수 있습니다.
+  * 최대 **500자** 텍스트 입력과 실시간 글자 수 카운터(`RetrospectiveDraft.clampContent()`)를 제공합니다.
+  * 작성 중인 변경 사항이 있을 때 닫기 또는 스와이프 종료를 시도하면 확인 얼럿(`interactiveDismissDisabled`)으로 데이터 유실을 방지합니다.
+  * 감정을 선택하면 상단 배경에 해당 감정의 아우라 워시(`EmotionWash`)가 부드럽게 전환됩니다.
+* **열람 및 삭제 (`RetrospectiveDetailView`):**
+  * 기록한 감정 아우라, 작성 일시, 회고 전문을 확인하고 우측 상단 `Menu`에서 **회고 편집** 시트를 열거나 삭제 확인 얼럿을 거쳐 안전하게 삭제할 수 있습니다.
+
+### 3. 7가지 감정 분류 및 AI 감정 추천
+* 복잡한 다중 태그 대신 하루의 핵심 정서를 직관적으로 분류할 수 있도록 **7가지 감정 분류(`Emotion`)** 를 적용했습니다.
+* 회고 본문을 작성한 뒤 **AI로 감정 추천받기** 버튼을 누르면 `EmotionRecommender`가 OpenAI API(`json_schema` strict 모드)를 호출해 가장 어울리는 감정 1개와 60자 이내의 근거 문장을 추천합니다.
+* AI 추천 이후에도 사용자가 상단 감정 카드에서 원하는 감정으로 언제든 직접 변경할 수 있습니다.
+
+| 감정 | 영문 식별자 (`rawValue`) | 아우라 에셋 |
+| :--- | :--- | :--- |
+| **기쁨** | `joy` | `joyAura` / `joyAuraStart`–`End` |
+| **성취** | `achievement` | `achievementAura` / `achievementAuraStart`–`End` |
+| **안정** | `stable` | `stableAura` / `stableAuraStart`–`End` |
+| **분노** | `angry` | `angryAura` / `angryAuraStart`–`End` |
+| **두려움** | `fear` | `fearAura` / `fearAuraStart`–`End` |
+| **슬픔** | `sad` | `sadAura` / `sadAuraStart`–`End` |
+| **소진** | `exhausted` | `exhaustedAura` / `exhaustedAuraStart`–`End` |
+
+### 4. 월간 감정 달력 및 일별 조회 (`달력` 탭)
+* `RetrospectiveListView`와 `CalendarView`를 통해 해당 월의 최다 감정 요약 문구, 월 이동 네비게이션, 7색 감정 달력, 하단 범례를 한눈에 보여줍니다.
+* 같은 날 여러 건의 회고를 남긴 경우 달력에는 가장 최근 작성한 감정을 표시하고, 하단 목록에서 최신 작성 순으로 전체 카드를 확인할 수 있습니다.
+* 기록이 없는 날짜는 `EmptyDayCard`로 상태에 맞는 안내를 보여줍니다. 오늘이면서 회고가 하나도 없으면 "첫 회고", 오늘은 "오늘 하루는 어땠나요?", 지난 날은 "이날은 기록이 없어요"와 함께 작성 버튼을 제공하고, 미래 날짜는 버튼 없이 안내만 표시합니다.
+
+### 5. 주간 · 월간 통계 및 AI 주간 회고 리포트 (`기록` 탭)
+* **기간 전환 및 요약 (`StatisticsView`):** `Picker(.segmented)`로 **주간 / 월간**을 전환하고, 총 기록 건수와 가장 많이 기록한 감정을 요약 카드로 제공합니다. 최다 감정에 맞춰 화면 배경에 `EmotionWash`를 표현합니다.
+* **감정 분포 막대 차트 (`EmotionBarChart`):** 7가지 감정의 기록 횟수를 그라데이션 막대 그래프로 시각화하고 최다 감정을 강조 표시합니다.
+* **기간별 공감 한마디 (`StatisticsFeedbackCard`):** 해당 기간 최다 감정에 맞는 주간·월간 맞춤 응원/위로 문구(`Emotion+Feedback`)를 표시합니다.
+* **AI 주간 회고 리포트 (`WeeklyAIReportSection`, `WeeklyReflectionAnalyzer`):** 주간 통계에서 **AI 주간 분석 시작하기**를 누르면 앱이 사전 계산한 통계 수치와 회고 본문을 OpenAI API로 전달해 **6가지 사고 모델** 관점으로 정리해 줍니다.
+  * **일어난 일** (`facts`) · **마음의 흐름** (`emotionalFlow`) · **좋았던 순간** (`positives`) · **마음 쓰인 일** (`regrets`) · **작은 힌트** (`solutions`) · **이번 주 한줄** (`summary`)
+
+## 데이터 저장
+
+| 저장 방식 | 대상 키 / 모델 | 관리 데이터 및 역할 |
+| :--- | :--- | :--- |
+| **`SwiftData`** | `@Model final class Retrospective` | 회고 본문 영구 저장 (`date: Date`, `content: String`, `emotionRaw: String`, `createdAt: Date`) |
+| **`@AppStorage`** | `"hasSeenWelcome"` (`Bool`) | 최초 실행 온보딩 완료 여부 저장 |
+| **`@AppStorage`** | `"appTheme"` (`AppTheme`) | 사용자 화면 테마 설정 저장 (`system`, `light`, `dark`) |
+
+## UI/UX · 접근성 · 성능 최적화
+
+### SwiftUI 네이티브 컴포넌트 및 다크 모드
+* `TabView`, `NavigationStack`, `ScrollView`, `LazyVGrid`, `DatePicker`, `Picker`, `Menu`, `TextEditor`, `sheet`, `popover`, `alert` 등 SwiftUI 네이티브 컴포넌트를 우선 사용했습니다.
+* `Assets.xcassets`에 라이트·다크 모드 대응 Color Set(`BgApp`, `BgCard`, `BgSelected`, `BorderDashed`, `TextPrimary`, `TextSecondary`, `TintPrimary`, `TintOnPrimary`, `StatusDestructive`, 7종 Aura Start/End)과 Image Set(앱 아이콘, 로고, AI 아이콘, 7종 아우라)을 구성했습니다.
+* `달력` 탭 좌측 상단 테마 메뉴에서 **시스템 / 라이트 / 다크** 모드를 즉시 전환할 수 있으며, `preferredColorScheme`으로 앱 전체에 반영됩니다.
+
+### 접근성 (Dynamic Type & VoiceOver)
+* **동적 글꼴 크기 대응:**
+  * 접근성 큰 글꼴(`.accessibility1` 이상) 설정 시 7칸 달력 레이아웃이 깨지지 않도록 달력 대신 날짜별 목록인 `DayListView`로 자동 전환하고(그 달에 기록이 없으면 빈 상태 카드), 상단 요약 문구를 숨깁니다.
+  * `AnyLayout`을 활용해 요약 카드(`StatisticsView`), 빈 상태 카드(`EmptyDayCard`), 공감 카드(`StatisticsFeedbackCard`), 날짜 행(`RetrospectiveWriteView`)을 가로(`HStack`)에서 세로(`VStack`)로 자동 재배치합니다.
+  * `ViewThatFits`로 달력 하단 감정 범례를 1줄 → 3열 → 2열 그리드로 자동 조정하며, 감정 선택 그리드(`EmotionPickerCard`)는 글꼴 크기에 따라 4열 → 3열 → 2열로 유연하게 변경됩니다.
+  * `@ScaledMetric`으로 아이콘·마커·셀 높이를 글꼴 크기에 비례해 스케일링합니다.
+* **VoiceOver 지원:**
+  * 달력 날짜 셀에 날짜와 기록 감정을 함께 읽어 주는 `.accessibilityLabel`을 제공하고, 막대 차트(`EmotionBarChart`)는 전체 분포를 요약해 `.accessibilityValue`로 안내합니다.
+  * 선택된 감정 카드에 `.isSelected` 트레이트를 부여하고, 장식용 아우라·배경 워시 요소는 `.accessibilityHidden(true)`로 불필요한 탐색을 줄였습니다.
+
+### 성능 및 크래시 방지
+* **안전한 옵셔널 처리:** 전체 코드베이스에서 강제 언래핑(`!`)을 사용하지 않고 `guard let`, `if let`, `??` 기본값 폴백(`Emotion(rawValue:) ?? .fallback`)으로 런타임 크래시를 방지했습니다.
+* **비동기 작업 생명주기 관리:** 회고 작성 화면을 닫으면 진행 중인 감정 추천 요청을(`.onDisappear`의 `cancel()`), 통계에서 기간이나 주를 바꾸면 진행 중인 주간 분석 요청을(`WeeklyAnalysisStore.reset()`) 취소해 불필요한 네트워크 호출과 상태 불일치를 방지합니다.
+* **예외 상황별 안내:** `OpenAIError`에서 API 키 미설정, 네트워크 오류, HTTP 401/429/기타 상태 코드, 모델 응답 거부(`refused`), 응답 파싱 실패를 구분해 사용자 친화적인 한국어 메시지를 표시합니다.
+
+## 기술 스택 및 의존 라이브러리
+
+| 구분 | 내용 |
+| :--- | :--- |
+| **언어 / UI** | Swift 5.0, SwiftUI |
+| **데이터 영구 저장** | SwiftData, `@AppStorage` (`UserDefaults`) |
+| **상태 관리** | `@Query`, `Observation` (`@Observable`), `Swift Concurrency` (`async/await`, `Task`) |
+| **네트워킹 / AI** | `URLSession` 기반 OpenAI Chat Completions API (`response_format: json_schema`, `strict: true`, 모델 `gpt-6-luna`) |
+| **외부 의존 라이브러리** | **없음 (Zero Third-Party Dependencies)** — SPM, CocoaPods, Carthage 없이 Apple 순정 프레임워크만 사용 |
+
+## 설치 및 실행 방법
+
+### 1. 개발 환경 요구 사항
+* macOS & Xcode 27.2 (개발·빌드 확인 환경)
+* iOS 17.0 이상 시뮬레이터 또는 실기기 (iPhone)
+
+### 2. 저장소 클론
+```bash
+git clone https://github.com/triplej709/estteam5.git
+cd estteam5
+```
+
+### 3. OpenAI API 키 설정 (AI 감정 추천 · 주간 분석 기능 사용 시)
+> API 키를 설정하지 않아도 회고 작성·조회·편집·삭제, 월간 달력, 주간/월간 통계 기능은 모두 정상 동작합니다.
+
+1. `firstProject/Config/Secrets.example.xcconfig` 파일을 같은 폴더(`firstProject/Config/`)에 복사해 이름을 `Secrets.xcconfig`로 변경합니다.
+2. `Secrets.xcconfig` 파일에 본인의 OpenAI API 키를 입력합니다. (값에 따옴표를 붙이지 마세요.)
+```text
+OPENAI_API_KEY = sk-본인의-실제-API-키
+```
+3. `Secrets.xcconfig`는 `.gitignore`에 등록되어 있어 Git 저장소에 업로드되지 않습니다.
+
+### 4. 프로젝트 실행
+1. Xcode에서 `firstProject/firstProject.xcodeproj` 파일을 엽니다.
+2. 상단 타깃에서 iPhone 시뮬레이터(iOS 17.0+)를 선택한 뒤 `Cmd + R`로 빌드 및 실행합니다.
+
+## 폴더 구조
+
+```text
+EstTeam5/
+├── README.md
+└── firstProject/
+    ├── Config/
+    │   ├── AdditionalInfo.plist          # 앱 표시 이름(Feelo) 및 OPENAI_API_KEY Info.plist 매핑
+    │   ├── Base.xcconfig                 # 공통 빌드 설정 (Secrets.xcconfig 선택적 include)
+    │   └── Secrets.example.xcconfig      # OpenAI API 키 설정 템플릿
+    ├── firstProject.xcodeproj/
+    └── firstProject/
+        ├── App/
+        │   ├── firstProjectApp.swift     # 앱 진입점, SwiftData 컨테이너, @AppStorage(온보딩·테마)
+        │   └── MainTabView.swift         # 하단 2탭 구성 (달력 / 기록)
+        ├── Models/
+        │   ├── DateHelpers.swift         # 한국어 Locale 및 날짜 구간 유틸리티
+        │   ├── Emotion/
+        │   │   ├── Emotion.swift         # 7가지 감정 열거형 및 아우라 컬러 매핑
+        │   │   ├── Emotion+Feedback.swift# 감정별 주간·월간 공감 문구
+        │   │   └── Emotion+Particle.swift# 한국어 주격 조사(이/가) 처리
+        │   ├── Retrospective/
+        │   │   ├── Retrospective.swift           # SwiftData @Model 회고 엔티티
+        │   │   ├── RetrospectiveDraft.swift      # 작성·편집 상태 및 500자 유효성 검증
+        │   │   ├── Retrospective+Calendar.swift  # 일별 최신 회고, 월간 최다 감정 요약
+        │   │   └── Retrospective+Statistics.swift# 기간별 필터링 및 감정별 건수 집계
+        │   └── Statistics/
+        │       ├── EmotionCount.swift            # 차트용 감정별 횟수 모델
+        │       ├── StatisticsPeriod.swift        # 주간/월간 기간 모델 및 라벨·날짜 계산
+        │       ├── WeeklyReflectionInput.swift   # AI 주간 분석 입력 데이터 구성
+        │       ├── WeeklyReflectionAnalysis.swift# 6가지 사고 모델 AI 분석 결과 모델
+        │       └── WeeklyAnalysisStore.swift     # @Observable 기반 AI 주간 분석 상태 관리
+        ├── Services/
+        │   ├── AppConfig.swift                   # Info.plist 기반 API 키 및 모델 설정 조회
+        │   ├── OpenAIClient.swift                # OpenAI Chat Completions 제네릭 클라이언트 및 오류 처리
+        │   ├── EmotionRecommender.swift          # 회고 본문 기반 AI 감정 추천 서비스
+        │   └── WeeklyReflectionAnalyzer.swift    # 6가지 사고 모델 AI 주간 회고 분석 서비스
+        ├── Views/
+        │   ├── Onboarding/
+        │   │   └── WelcomeView.swift             # 첫 실행 온보딩 화면
+        │   ├── Calendar/
+        │   │   ├── CalendarView.swift            # 월간 7열 감정 달력 그리드
+        │   │   └── DayListView.swift             # 접근성 큰 글꼴용 날짜별 회고 목록
+        │   ├── Retrospective/
+        │   │   ├── RetrospectiveListView.swift   # 달력 탭 메인 (월 이동, 달력, 범례, 일별 카드, 테마 설정)
+        │   │   ├── RetrospectiveWriteView.swift  # 회고 작성·편집 시트 및 AI 감정 추천 UI
+        │   │   ├── RetrospectiveDetailView.swift # 회고 상세 열람 및 편집/삭제 메뉴
+        │   │   └── EmptyDayCard.swift            # 날짜 상태별 빈 기록 안내 카드
+        │   ├── Statistics/
+        │   │   ├── StatisticsView.swift          # 기록 탭 메인 (주간/월간 전환, 요약 카드, 배경 워시)
+        │   │   ├── EmotionBarChart.swift         # 감정 분포 그라데이션 막대 차트
+        │   │   ├── StatisticsFeedbackCard.swift  # 최다 감정 기반 주간·월간 한마디 카드
+        │   │   ├── StatisticsEmptyState.swift    # 통계 데이터 없음 안내 카드
+        │   │   └── WeeklyAIReportSection.swift   # AI 주간 회고 리포트 카드 및 상태 UI
+        │   ├── Settings/
+        │   │   └── AppTheme.swift                # 시스템/라이트/다크 테마 열거형
+        │   └── Design/
+        │       └── EmotionAuraView.swift         # 감정 아우라 아이콘 및 배경 워시(EmotionWash)
+        └── Assets.xcassets/                      # 라이트/다크 앱 아이콘, 로고, 컬러셋, 아우라 이미지셋
+```
+
+## 주요 API 및 서비스 인터페이스
+
+| 타입 | 위치 | 주요 메서드 / 역할 |
+| :--- | :--- | :--- |
+| `Retrospective` | `Models/Retrospective/Retrospective.swift`<br>`Retrospective+Calendar.swift`<br>`Retrospective+Statistics.swift` | SwiftData 영구 저장 모델. 확장 파일에서 `latest(in:on:)`, `topEmotion(in:)`, `inPeriod(_:_:of:)`, `emotionCounts(in:)` 정적 집계 메서드 제공 |
+| `OpenAIClient` | `Services/OpenAIClient.swift` | `send(system:user:schemaName:schema:timeout:) async throws -> Output` — Structured Outputs(`json_schema`) 디코딩 및 `OpenAIError` 매핑 |
+| `EmotionRecommender` | `Services/EmotionRecommender.swift` | `recommend(for content: String) async throws -> EmotionRecommendation` — 회고 텍스트 분석 후 감정 및 추천 이유 반환 |
+| `WeeklyReflectionAnalyzer` | `Services/WeeklyReflectionAnalyzer.swift` | `analyze(_ input: WeeklyReflectionInput) async throws -> WeeklyReflectionAnalysis` — 주간 회고를 6가지 사고 모델로 분석 |
+| `WeeklyAnalysisStore` | `Models/Statistics/WeeklyAnalysisStore.swift` | `analyze(_:)`, `reset()` — 주간 AI 분석 비동기 상태(`idle`, `loading`, `loaded`, `failed`) 관리 |
+
+## 팀원 소개 및 역할 분담
 
 | 이름 | 역할 | 담당 파트 | 주요 업무 |
 | :--- | :---: | :---: | :--- |
-| **장주진** | 팀장 | 로직 / 총괄 | • GitHub 저장소 관리, PR 및 코드 리뷰<br>• SwiftData 모델·구조 세팅, 회고 작성 뷰 및 로직 분리, OpenAI API 연동(감정 추천) |
-| **백충훈** | 팀원 | 로직 / 통계 | • 초기 회고 및 통계 레이아웃 구현<br>• 코드 흐름 정리, MCP 연동 및 사용자 피드백·일정(WBS) 조율 |
-| **임사랑** | 팀원 | UI / 문서화 | • 회고 탭 네비게이션 적용 및 통계 도출값 테스트<br>• 회의록·`README.md` 정리 및 발표 자료(PPT) 제작 |
-| **전효정** | 팀원 | UI / 디자인 | • Figma 전체 화면 UI/UX 디자인 및 디자인 토큰·수정사항 반영<br>• 화면 우선순위 기획 및 발표 자료(PPT) 제작 |
-
-## ✨ 3. 핵심 기능 및 구현 현황
-
-### 1️⃣ 온보딩 (`WelcomeView`)
-* 7가지 감정 아우라 구슬 배치와 브랜드 소개(*"오늘의 감정을 색으로 남겨요"*) 첫 실행 화면 구현
-* 디버그 환경에서 `-skipWelcome` 실행 인자로 스킵 테스트 지원
-
-### 2️⃣ 회고 작성·편집·삭제 (CRUD) 및 7가지 감정 선택 (`RetrospectiveWriteView`)
-* 날짜 선택(미래 날짜 제한), 500자 이내 텍스트 회고 작성·편집·삭제
-* 선택 감정에 따라 상단 배경에 아우라 워시(`EmotionWash`) 애니메이션 적용
-* 오늘의 대표 감정을 **7가지 감정 분류** 중에서 선택하고 고유 그라데이션 아우라로 표시
-
-| 번호 | 상위 감정 개념 | 포함 세부 감정 키워드 |
-| :---: | :--- | :--- |
-| **1** | **기쁨** | 즐거움, 행복, 설렘, 신난다, 고맙다 |
-| **2** | **성취** | 뿌듯하다, 보람차다, 만족하다, 자신있다 |
-| **3** | **안정** | 평안하다, 평온하다, 안도함, 무난하다 |
-| **4** | **분노** | 화남, 불쾌하다, 짜증나다, 답답하다, 억울하다 |
-| **5** | **두려움** | 불안하다, 걱정함, 초조하다, 긴장된다 |
-| **6** | **슬픔** | 우울하다, 아쉽다, 서운하다, 외롭다, 허무하다 |
-| **7** | **소진** | 피곤하다, 무기력하다, 번아웃, 지쳤다 |
-
-### 3️⃣ 월간 감정 달력 및 일별 회고 조회 (`회고` 탭)
-* SwiftData(`AppContainer`)를 활용한 로컬 데이터 영구 저장
-* 월간 달력(`CalendarView`)에 날짜별 감정 아우라 표시 및 앱 시작일 이후 미기록 날짜 점선 표시
-* 같은 날 여러 건을 기록할 경우 가장 최근 작성한 감정을 달력에 반영하며, 하단 카드 목록에서 전체 내역 확인
-* 날짜 상태(첫 사용·오늘·과거·미래)별 빈 화면 안내(`EmptyDayCard`) 및 상세 화면(`RetrospectiveDetailView`)에서 편집·삭제 지원
-
-### 4️⃣ AI 감정 추천 (`EmotionRecommender`)
-* 회고 본문을 작성한 뒤 **‘AI로 감정 추천받기’** 버튼을 누르면 OpenAI API(`json_schema` strict 모드)로 7가지 감정 중 가장 어울리는 감정을 추천
-* API 키 미설정, 네트워크 오류, HTTP 상태 코드, 응답 거부 등 예외 상황별 안내 메시지 처리 완료
-* *(논의 중)* AI 추천 감정을 사용자가 직접 변경할 수 있게 유지할지, AI 추천 전용으로 둘지 확정 예정
-
-### 5️⃣ 주간·월간 감정 통계 (`통계` 탭)
-* **주간 / 월간** 기간 전환 세그먼트 및 기간 이동 네비게이션
-* 기간별 총 회고 건수 및 최다 기록 감정 요약 카드
-* **감정 흐름 그리드:** 기간 내 일별 감정 기록 여부를 시각적으로 표시
-* **감정 분포 차트:** Swift Charts 기반 분포 차트 및 감정별 횟수·비율 범례 제공
-
-## 🎨 4. 화면 및 폴더 구조
-
-* **하단 탭바 구성 (2개 탭):** `회고` / `통계`
-
-| 화면 | 파일명 | 주요 역할 |
-| :--- | :--- | :--- |
-| 온보딩 | `Views/Onboarding/WelcomeView.swift` | 앱 소개 및 7색 감정 아우라 첫 실행 화면 |
-| 회고 달력·목록 | `Views/Retrospective/RetrospectiveListView.swift`<br>`Views/Calendar/CalendarView.swift` | 월별 감정 달력, 범례, 선택 날짜 회고 카드 목록 |
-| 회고 작성·편집 | `Views/Retrospective/RetrospectiveWriteView.swift` | 날짜·감정 선택, 500자 입력, AI 감정 추천 |
-| 회고 상세 | `Views/Retrospective/RetrospectiveDetailView.swift` | 회고 전문 열람, 편집 시트 및 삭제 확인 |
-| 통계 | `Views/Statistics/StatisticsView.swift` | 주간/월간 전환, 요약 카드, 감정 흐름, 분포 차트 |
-| 디자인 시스템 | `Views/Design/FeeloTokens.swift`<br>`Views/Design/EmotionAuraView.swift` | 브랜드 컬러·반경 토큰 및 아우라 구슬 컴포넌트 |
-
-```text
-firstProject/
-├── App/          # 앱 진입점(firstProjectApp), 탭 구성(MainTabView)
-├── Models/       # SwiftData 모델(Retrospective), Emotion 열거형 및 드래프트
-├── Services/     # OpenAI 추천(EmotionRecommender), 설정(AppConfig), 디버그 시드(DebugSample)
-└── Views/        # Onboarding, Calendar, Retrospective, Statistics, Design
-```
-
-## 🔧 5. 2일차 피드백 반영 및 추후 확장 계획
-
-### 🔹 2일차 UI/기능 수정 예정 (튜터 피드백 및 디자인 점검 반영)
-* **레이아웃·화면 정리:** 카테고리/태그 관련 기능 및 세부 화면 제거, 통계 탭 내 설정 버튼 제거, `Month Navigation` 우측 패딩 및 `Title and Subtitle` 간격 `4`로 통일
-* **통계·공감 피드백 고도화:**
-  * 감정 분포 차트를 횟수 파악이 직관적인 **막대 그래프**로 전환 검토·반영
-  * 가장 많이 기록한 감정으로 통계 영역 배경색 표현
-  * 감정 분포 하단에 해당 감정에 맞는 AI 공감·위로 문구 및 질문 기능 추가
-* **다크 모드 & 설정:** 회고 탭 상단 화면 설정 버튼 시트 연결 및 다크 모드 Color Set 적용
-
-### 🔹 추후 검토 (기본 기능 완성 후 시간 여유 시 진행)
-* **6가지 색깔 생각법(Six Thinking Hats) 구조화 회고:** 사실(⚪)·감정(🔴)·긍정(🟡)·아쉬움(⚫)·대안(🟢)·요약(🔵) 구조화 템플릿 및 감정-대안 전환율 분석
-
-## 📋 6. 진행 현황 체크리스트
-
-- [x] GitHub 저장소 생성, 팀원 초대 및 브랜치 규칙 합의
-- [x] 팀원 역할 분담 및 핵심 기능·7가지 감정 분류 확정
-- [x] Figma 전체 화면 디자인 및 Feelo 디자인 토큰 정의
-- [x] SwiftData 데이터 모델(`Retrospective`) 및 디버그 샘플 시드(`DebugSample`) 구축
-- [x] 온보딩(`WelcomeView`), 회고 달력·목록·상세·작성 CRUD 구현
-- [x] OpenAI API 기반 AI 감정 추천(`EmotionRecommender`) 연동
-- [x] 주간·월간 감정 통계 및 감정 흐름·분포 차트 초기 구현
-- [x] 2일차 UI 정리: 카테고리/태그 제거, 통계 탭 설정 버튼 제거
-- [ ] 감정 분포 차트 막대 그래프 전환 (현재 도넛 차트)
-- [ ] 최다 감정 기준 통계 영역 배경색 적용
-- [ ] 감정 분포 하단 AI 공감·위로 문구 추가
-- [ ] AI 감정 추천 + 사용자 수동 변경 허용 여부 최종 확정
-- [ ] 다크 모드 Color Set 적용 및 화면 설정 시트 연결
-- [ ] 발표 자료(PPT) 제작 및 최종 문서 정리
+| **장주진** | 팀장 | 개발 총괄 / AI 연동 | GitHub 저장소 관리, PR·코드 리뷰 총괄, 프로젝트 뼈대·SwiftData 모델·API 키 설정, 테마·Dynamic Type 지원·코드 정리, AI 감정 추천·OpenAI 공통 클라이언트 구현 |
+| **백충훈** | 팀원 | 핵심 화면 · 로직 개발 | 월간 감정 캘린더·회고 작성·상세 화면 구현, 통계 탭 구현·감정 워시(배경 번짐), 캘린더·회고 계산 로직 분리·코드 정리, 사용자 피드백 수렴·주간 일정(WBS) 조율 |
+| **임사랑** | 팀원 | 통계 · AI 리포트 / 문서화 | AI 주간 회고 리포트 구현·통계 로직 분리, 감정 분류 체계 기획·통계 화면 구조 기획, 회고 목록 내비게이션·통계 정합성 테스트, 회의록·README·발표자료 문서화 |
+| **전효정** | 팀원 | UI/UX · 디자인 총괄 | Figma UI/UX·디자인 시스템·디자인 총괄, 7종 감정 아우라·앱 아이콘·로고 에셋, 서비스 기획·서비스 구조 기획, 발표자료 디자인·제작 |
