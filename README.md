@@ -21,22 +21,33 @@
 
 ## 대표 앱 화면
 
+<div align="center">
+
 <table>
   <tr>
-    <td align="center"><img src="docs/images/01-calendar.png" width="165" alt="월간 감정 달력" /></td>
-    <td align="center"><img src="docs/images/02-write.png" width="165" alt="회고 작성과 AI 감정 추천" /></td>
-    <td align="center"><img src="docs/images/03-detail.png" width="165" alt="회고 상세" /></td>
-    <td align="center"><img src="docs/images/04-statistics.png" width="165" alt="주간 통계와 AI 리포트" /></td>
-    <td align="center"><img src="docs/images/05-dark.png" width="165" alt="다크 모드" /></td>
+    <td align="center" width="270"><img src="docs/images/01-calendar.png" width="250" alt="달력 · 이 달의 감정" /></td>
+    <td align="center" width="270"><img src="docs/images/02-write.png" width="250" alt="회고 작성" /></td>
+    <td align="center" width="270"><img src="docs/images/03-detail.png" width="250" alt="회고 상세" /></td>
   </tr>
   <tr>
-    <td valign="top" align="center"><b>월간 감정 달력</b><br/>날짜별 감정 아우라와 최다 감정 요약, 하단 범례</td>
-    <td valign="top" align="center"><b>회고 작성 · AI 추천</b><br/>감정 선택, AI 추천 감정과 이유, 500자 입력</td>
-    <td valign="top" align="center"><b>회고 상세</b><br/>감정 배경과 작성 일시, 회고 전문, 편집·삭제 메뉴</td>
-    <td valign="top" align="center"><b>주간 통계 · AI 리포트</b><br/>감정 분포 막대 그래프, 주간 한마디, 6단계 AI 리포트</td>
-    <td valign="top" align="center"><b>다크 모드</b><br/>같은 화면을 다크 테마로 표시</td>
+    <td valign="top" align="center" width="270">날짜별 감정 아우라와<br/>최다 감정 요약, 하단 범례</td>
+    <td valign="top" align="center" width="270">감정 선택, AI 추천 감정과 이유,<br/>500자 입력</td>
+    <td valign="top" align="center" width="270">감정 배경과 작성 일시,<br/>회고 전문, 편집·삭제 메뉴</td>
   </tr>
 </table>
+
+<table>
+  <tr>
+    <td align="center" width="270"><img src="docs/images/04-statistics.png" width="250" alt="감정 돌아보기" /></td>
+    <td align="center" width="270"><img src="docs/images/05-dark.png" width="250" alt="다크 모드 지원" /></td>
+  </tr>
+  <tr>
+    <td valign="top" align="center" width="270">감정 분포 막대 그래프, 주간 한마디,<br/>6단계 AI 리포트</td>
+    <td valign="top" align="center" width="270">같은 화면을 다크 테마로 표시</td>
+  </tr>
+</table>
+
+</div>
 
 > 화면의 기록은 시연을 위해 넣은 예시 데이터입니다.
 
@@ -100,6 +111,8 @@
 | **`@AppStorage`** | `"hasSeenWelcome"` (`Bool`) | 최초 실행 온보딩 완료 여부 저장 |
 | **`@AppStorage`** | `"appTheme"` (`AppTheme`) | 사용자 화면 테마 설정 저장 (`system`, `light`, `dark`) |
 
+> 데이터 모델의 자세한 구조(ERD)는 [`docs/ERD.md`](docs/ERD.md)를 참고하세요.
+
 ## UI/UX · 접근성 · 성능 최적화
 
 ### SwiftUI 네이티브 컴포넌트 및 다크 모드
@@ -124,13 +137,36 @@
 
 ## 기술 스택 및 의존 라이브러리
 
-| 구분 | 내용 |
-| :--- | :--- |
-| **언어 / UI** | Swift 5.0, SwiftUI |
-| **데이터 영구 저장** | SwiftData, `@AppStorage` (`UserDefaults`) |
-| **상태 관리** | `@Query`, `Observation` (`@Observable`), `Swift Concurrency` (`async/await`, `Task`) |
-| **네트워킹 / AI** | `URLSession` 기반 OpenAI Chat Completions API (`response_format: json_schema`, `strict: true`, 모델 `gpt-6-luna`) |
-| **외부 의존 라이브러리** | **없음 (Zero Third-Party Dependencies)** — SPM, CocoaPods, Carthage 없이 Apple 순정 프레임워크만 사용 |
+<table>
+  <thead>
+    <tr>
+      <th width="190">구분</th>
+      <th>내용</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td nowrap><b>언어 / UI</b></td>
+      <td>Swift 5.0, SwiftUI</td>
+    </tr>
+    <tr>
+      <td nowrap><b>데이터 영구 저장</b></td>
+      <td>SwiftData, <code>@AppStorage</code> (<code>UserDefaults</code>)</td>
+    </tr>
+    <tr>
+      <td nowrap><b>상태 관리</b></td>
+      <td><code>@Query</code>, <code>Observation</code> (<code>@Observable</code>), <code>Swift Concurrency</code> (<code>async/await</code>, <code>Task</code>)</td>
+    </tr>
+    <tr>
+      <td nowrap><b>네트워킹 / AI</b></td>
+      <td><code>URLSession</code> 기반 OpenAI Chat Completions API (<code>response_format:&nbsp;json_schema</code>, <code>strict:&nbsp;true</code>, 모델 <code>gpt-6-luna</code>)</td>
+    </tr>
+    <tr>
+      <td nowrap><b>외부 의존 라이브러리</b></td>
+      <td><b>없음 (Zero Third-Party Dependencies)</b> — SPM·CocoaPods·Carthage 없이 Apple 기본 프레임워크만 사용</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 설치 및 실행 방법
 
@@ -231,9 +267,39 @@ EstTeam5/
 
 ## 팀원 소개 및 역할 분담
 
-| 이름 | 역할 | 담당 파트 | 주요 업무 |
-| :--- | :---: | :---: | :--- |
-| **장주진** | 팀장 | 개발 총괄 / AI 연동 | GitHub 저장소 관리, PR·코드 리뷰 총괄, 프로젝트 뼈대·SwiftData 모델·API 키 설정, 테마·Dynamic Type 지원·코드 정리, AI 감정 추천·OpenAI 공통 클라이언트 구현 |
-| **백충훈** | 팀원 | 핵심 화면 · 로직 개발 | 월간 감정 캘린더·회고 작성·상세 화면 구현, 통계 탭 구현·감정 워시(배경 번짐), 캘린더·회고 계산 로직 분리·코드 정리, 사용자 피드백 수렴·주간 일정(WBS) 조율 |
-| **임사랑** | 팀원 | 통계 · AI 리포트 / 문서화 | AI 주간 회고 리포트 구현·통계 로직 분리, 감정 분류 체계 기획·통계 화면 구조 기획, 회고 목록 내비게이션·통계 정합성 테스트, 회의록·README·발표자료 문서화 |
-| **전효정** | 팀원 | UI/UX · 디자인 총괄 | Figma UI/UX·디자인 시스템·디자인 총괄, 7종 감정 아우라·앱 아이콘·로고 에셋, 서비스 기획·서비스 구조 기획, 발표자료 디자인·제작 |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="70">이름</th>
+      <th width="50">역할</th>
+      <th width="130">담당 파트</th>
+      <th>주요 업무</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center" nowrap><b>장주진</b></td>
+      <td align="center" nowrap>팀장</td>
+      <td>개발 총괄 / AI 연동</td>
+      <td>GitHub 저장소 관리·PR/코드 리뷰 총괄, 프로젝트 뼈대·SwiftData 모델·API 키 설정<br/>테마·Dynamic Type 지원·코드 정리, AI 감정 추천·OpenAI 공통 클라이언트 구현</td>
+    </tr>
+    <tr>
+      <td align="center" nowrap><b>백충훈</b></td>
+      <td align="center" nowrap>팀원</td>
+      <td>핵심 화면 · 로직 개발</td>
+      <td>월간 감정 캘린더·회고 작성·상세 화면 구현, 통계 탭 구현·감정 워시(배경 번짐) 토큰<br/>캘린더·회고 계산 로직 분리·코드 정리, 사용자 피드백 수렴·주간 일정(WBS) 조율</td>
+    </tr>
+    <tr>
+      <td align="center" nowrap><b>임사랑</b></td>
+      <td align="center" nowrap>팀원</td>
+      <td>통계 · AI 리포트 /<br/>문서화</td>
+      <td>AI 주간 회고 리포트 구현·통계 로직 분리, 감정 분류 체계·통계 화면 구조 기획<br/>회고 목록 내비게이션·통계 정합성 테스트, 회의록·README·발표자료 문서화</td>
+    </tr>
+    <tr>
+      <td align="center" nowrap><b>전효정</b></td>
+      <td align="center" nowrap>팀원</td>
+      <td>UI/UX · 디자인 총괄</td>
+      <td>Figma UI/UX·디자인 시스템·디자인 총괄, 7종 감정 아우라·앱 아이콘·로고 에셋<br/>서비스 기획·서비스 구조 기획, 발표자료 디자인·제작·앱 소개 영상 제작</td>
+    </tr>
+  </tbody>
+</table>
