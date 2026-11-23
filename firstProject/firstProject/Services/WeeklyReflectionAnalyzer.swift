@@ -1,14 +1,27 @@
 import Foundation
 
+/// 한 주의 회고를 OpenAI로 분석하는 서비스입니다.
 struct WeeklyReflectionAnalyzer {
+    /// 오류 메시지(`OpenAIError.userMessage(for:)`)에 사용하는 기능 이름입니다.
     static let feature = "분석"
 
+    /// OpenAI 요청을 보내는 클라이언트입니다.
     private let client: OpenAIClient
 
+    /// 분석 서비스를 생성합니다.
+    ///
+    /// - Parameter client: 요청을 보낼 클라이언트입니다. 기본값은 `OpenAIClient()`입니다.
     init(client: OpenAIClient = OpenAIClient()) {
         self.client = client
     }
 
+    /// 주간 회고 입력을 분석해 6가지 항목으로 정리한 결과를 반환합니다.
+    ///
+    /// 제한 시간 30초로 요청을 보냅니다.
+    ///
+    /// - Parameter input: 분석할 주간 회고 입력입니다.
+    /// - Returns: 일어난 일, 마음의 흐름 등을 담은 분석 결과입니다.
+    /// - Throws: `OpenAIClient.send`가 던지는 오류(`OpenAIError` 또는 `CancellationError`)를 그대로 던집니다.
     func analyze(_ input: WeeklyReflectionInput) async throws -> WeeklyReflectionAnalysis {
         try await client.send(
             system: Self.systemPrompt,
@@ -19,6 +32,12 @@ struct WeeklyReflectionAnalyzer {
         )
     }
 
+    /// 입력으로부터 사용자 메시지 본문을 만듭니다.
+    ///
+    /// 기간, 기록 건수와 기록한 일수, 가장 많이 선택한 감정(있을 때만), 감정 분포, 요일별 감정 흐름, 회고 기록을 줄 단위로 이어 붙입니다.
+    ///
+    /// - Parameter input: 주간 회고 입력입니다.
+    /// - Returns: OpenAI에 보낼 사용자 메시지 문자열입니다.
     private static func makeUserContent(from input: WeeklyReflectionInput) -> String {
         let weekdayStyle = Date.FormatStyle.dateTime.weekday(.abbreviated).locale(.korean)
         let dateStyle = Date.FormatStyle.dateTime.month().day().weekday(.abbreviated).locale(.korean)
@@ -45,6 +64,7 @@ struct WeeklyReflectionAnalyzer {
         return lines.joined(separator: "\n")
     }
 
+    /// 6가지 항목(facts, emotional_flow, positives, regrets, solutions, summary)으로 정리하도록 지시하는 시스템 프롬프트입니다.
     private static var systemPrompt: String {
         """
         사용자가 한 주 동안 쓴 회고를 읽고, 6가지 사고 모델로 한국어로 다정하고 명료하게 정리한다.
@@ -59,6 +79,7 @@ struct WeeklyReflectionAnalyzer {
         """
     }
 
+    /// 6가지 항목을 모두 문자열 필수 값으로 요구하는 응답 JSON 스키마입니다.
     private static var schema: [String: Any] {
         [
             "type": "object",

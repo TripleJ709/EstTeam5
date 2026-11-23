@@ -1,9 +1,12 @@
 import SwiftUI
 
+/// 앱 첫 실행 시 보여주는 환영 화면입니다.
 struct WelcomeView: View {
+    /// 시작하기 버튼을 눌렀을 때 호출되는 클로저입니다.
     let onStart: () -> Void
 
     // Figma(402×341) 기준 좌표. frame은 글로우 여백(×1.3)을 포함한 크기.
+    /// 히어로 영역에 배치하는 감정 오로라들의 위치와 크기 목록입니다.
     private let auras: [HeroAura] = [
         HeroAura(emotion: .joy, x: 139.28, y: 59.25, frame: 177.049),
         HeroAura(emotion: .achievement, x: 57.57, y: 43.82, frame: 108.953),
@@ -14,8 +17,10 @@ struct WelcomeView: View {
         HeroAura(emotion: .exhausted, x: 213.28, y: 216.78, frame: 72.636)
     ]
 
+    /// 오로라 이미지에 글로우 여백을 더하는 배율입니다.
     private let glowScale: CGFloat = 1.3
 
+    /// 화면 구성: 소개 문구와 히어로 이미지를 스크롤 영역에 배치하고, 하단에 시작하기 버튼을 고정합니다.
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -39,6 +44,7 @@ struct WelcomeView: View {
         .background(alignment: .topLeading) { background }
     }
 
+    /// 앱 배경색 위에 기쁨 감정 색의 흐린 방사형 그라데이션을 깔아 주는 배경입니다.
     private var background: some View {
         ZStack(alignment: .topLeading) {
             Color.bgApp
@@ -61,6 +67,7 @@ struct WelcomeView: View {
         .accessibilityHidden(true)
     }
 
+    /// 감정 오로라 이미지들과 물음표·느낌표 이미지를 배치한 히어로 영역입니다.
     private var hero: some View {
         ZStack(alignment: .topLeading) {
             ForEach(auras) { aura in
@@ -88,6 +95,7 @@ struct WelcomeView: View {
         .accessibilityHidden(true)
     }
 
+    /// 로고, 제목, 설명 문구를 세로로 쌓은 소개 영역입니다.
     private var introText: some View {
         VStack(spacing: 10) {
             Image("Logo")
@@ -109,6 +117,7 @@ struct WelcomeView: View {
         }
     }
 
+    /// `onStart`를 실행하는 "시작하기" 버튼입니다.
     private var startButton: some View {
         Button(action: onStart) {
             Text("시작하기")
@@ -123,12 +132,18 @@ struct WelcomeView: View {
     }
 }
 
+/// 히어로 영역의 오로라 하나에 대한 감정, 위치, 프레임 크기 정보입니다.
 private struct HeroAura: Identifiable {
+    /// 오로라가 나타내는 감정입니다.
     let emotion: Emotion
+    /// 히어로 영역 안에서의 가로 위치입니다.
     let x: CGFloat
+    /// 히어로 영역 안에서의 세로 위치입니다.
     let y: CGFloat
+    /// 글로우 여백을 포함한 프레임 크기입니다.
     let frame: CGFloat
 
+    /// 감정 값을 식별자로 사용합니다.
     var id: Emotion { emotion }
 }
 
