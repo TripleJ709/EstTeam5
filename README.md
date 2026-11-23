@@ -117,7 +117,7 @@
 
 ### SwiftUI 네이티브 컴포넌트 및 다크 모드
 * `TabView`, `NavigationStack`, `ScrollView`, `LazyVGrid`, `DatePicker`, `Picker`, `Menu`, `TextEditor`, `sheet`, `popover`, `alert` 등 SwiftUI 네이티브 컴포넌트를 우선 사용했습니다.
-* `Assets.xcassets`에 라이트·다크 모드 대응 Color Set(`BgApp`, `BgCard`, `BgSelected`, `BorderDashed`, `TextPrimary`, `TextSecondary`, `TintPrimary`, `TintOnPrimary`, `StatusDestructive`, 7종 Aura Start/End)과 Image Set(앱 아이콘, 로고, AI 아이콘, 7종 아우라)을 구성했습니다.
+* `Assets.xcassets`에 라이트·다크 모드 대응 Color Set(`BgApp`, `BgCard`, `BgSelected`, `BorderDashed`, `TextPrimary`, `TextSecondary`, `TintPrimary`, `TintOnPrimary`, `StatusDestructive`, 7종 Aura Start/End)과 Image Set(앱 아이콘, 로고, AI 아이콘, 7종 감정)을 구성했습니다.
 * `달력` 탭 좌측 상단 테마 메뉴에서 **시스템 / 라이트 / 다크** 모드를 즉시 전환할 수 있으며, `preferredColorScheme`으로 앱 전체에 반영됩니다.
 
 ### 접근성 (Dynamic Type & VoiceOver)
