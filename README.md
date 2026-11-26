@@ -78,7 +78,7 @@
 
 ### 3. 7가지 감정 분류 및 AI 감정 추천
 * 복잡한 다중 태그 대신 하루의 핵심 정서를 직관적으로 분류할 수 있도록 **7가지 감정 분류(`Emotion`)** 를 적용했습니다.
-* 회고 본문을 작성한 뒤 **AI로 감정 추천받기** 버튼을 누르면 `EmotionRecommender`가 OpenAI API(`json_schema` strict 모드)를 호출해 가장 어울리는 감정 1개와 60자 이내의 근거 문장을 추천합니다.
+* 회고 본문을 작성한 뒤 **AI로 감정 추천받기** 버튼을 누르면 `EmotionRecommender`가 Firebase 서버를 거쳐 OpenAI API(`json_schema` strict 모드)를 호출해 가장 어울리는 감정 1개와 60자 이내의 근거 문장을 추천합니다.
 * AI 추천 이후에도 사용자가 상단 감정 카드에서 원하는 감정으로 언제든 직접 변경할 수 있습니다.
 
 | 감정 | 영문 식별자 (`rawValue`) | 아우라 에셋 |
@@ -100,7 +100,7 @@
 * **기간 전환 및 요약 (`StatisticsView`):** `Picker(.segmented)`로 **주간 / 월간**을 전환하고, 총 기록 건수와 가장 많이 기록한 감정을 요약 카드로 제공합니다. 최다 감정에 맞춰 화면 배경에 `EmotionWash`를 표현합니다.
 * **감정 분포 막대 차트 (`EmotionBarChart`):** 7가지 감정의 기록 횟수를 그라데이션 막대 그래프로 시각화하고 최다 감정을 강조 표시합니다.
 * **기간별 공감 한마디 (`StatisticsFeedbackCard`):** 해당 기간 최다 감정에 맞는 주간·월간 맞춤 응원/위로 문구(`Emotion+Feedback`)를 표시합니다.
-* **AI 주간 회고 리포트 (`WeeklyAIReportSection`, `WeeklyReflectionAnalyzer`):** 주간 통계에서 **AI 주간 분석 시작하기**를 누르면 앱이 사전 계산한 통계 수치와 회고 본문을 OpenAI API로 전달해 **6가지 사고 모델** 관점으로 정리해 줍니다.
+* **AI 주간 회고 리포트 (`WeeklyAIReportSection`, `WeeklyReflectionAnalyzer`):** 주간 통계에서 **AI 주간 분석 시작하기**를 누르면 앱이 사전 계산한 통계 수치와 회고 본문을 Firebase 서버를 거쳐 OpenAI API로 전달해 **6가지 사고 모델** 관점으로 정리해 줍니다.
   * **일어난 일** (`facts`) · **마음의 흐름** (`emotionalFlow`) · **좋았던 순간** (`positives`) · **마음 쓰인 일** (`regrets`) · **작은 힌트** (`solutions`) · **이번 주 한줄** (`summary`)
 
 ## 데이터 저장
@@ -133,7 +133,7 @@
 ### 성능 및 크래시 방지
 * **안전한 옵셔널 처리:** 전체 코드베이스에서 강제 언래핑(`!`)을 사용하지 않고 `guard let`, `if let`, `??` 기본값 폴백(`Emotion(rawValue:) ?? .fallback`)으로 런타임 크래시를 방지했습니다.
 * **비동기 작업 생명주기 관리:** 회고 작성 화면을 닫으면 진행 중인 감정 추천 요청을(`.onDisappear`의 `cancel()`), 통계에서 기간이나 주를 바꾸면 진행 중인 주간 분석 요청을(`WeeklyAnalysisStore.reset()`) 취소해 불필요한 네트워크 호출과 상태 불일치를 방지합니다.
-* **예외 상황별 안내:** `OpenAIError`에서 API 키 미설정, 네트워크 오류, HTTP 401/429/기타 상태 코드, 모델 응답 거부(`refused`), 응답 파싱 실패를 구분해 사용자 친화적인 한국어 메시지를 표시합니다.
+* **예외 상황별 안내:** `AIServerError`에서 네트워크 오류, 요청 과다, 내용 길이 초과, 앱 확인 실패, 서버 오류, 모델 응답 거부(`refused`), 응답 파싱 실패를 구분해 사용자 친화적인 한국어 메시지를 표시합니다.
 
 ## 기술 스택 및 의존 라이브러리
 
@@ -159,11 +159,11 @@
     </tr>
     <tr>
       <td nowrap><b>네트워킹 / AI</b></td>
-      <td><code>URLSession</code> 기반 OpenAI Chat Completions API (<code>response_format:&nbsp;json_schema</code>, <code>strict:&nbsp;true</code>, 모델 <code>gpt-6-luna</code>)</td>
+      <td>Firebase Cloud Functions(서울) + App Check를 거친 OpenAI Chat Completions API (<code>response_format:&nbsp;json_schema</code>, <code>strict:&nbsp;true</code>, 모델 <code>gpt-6-luna</code>)</td>
     </tr>
     <tr>
       <td nowrap><b>외부 의존 라이브러리</b></td>
-      <td><b>없음 (Zero Third-Party Dependencies)</b> — SPM·CocoaPods·Carthage 없이 Apple 기본 프레임워크만 사용</td>
+      <td>Firebase iOS SDK (<code>FirebaseCore</code>, <code>FirebaseFunctions</code>, <code>FirebaseAppCheck</code>, SPM)</td>
     </tr>
   </tbody>
 </table>
@@ -180,15 +180,29 @@ git clone https://github.com/triplej709/estteam5.git
 cd estteam5
 ```
 
-### 3. OpenAI API 키 설정 (AI 감정 추천 · 주간 분석 기능 사용 시)
-> API 키를 설정하지 않아도 회고 작성·조회·편집·삭제, 월간 달력, 주간/월간 통계 기능은 모두 정상 동작합니다.
+### 3. AI 기능 사용 준비 (AI 감정 추천 · 주간 분석)
+> 아래 설정을 하지 않아도 회고 작성·조회·편집·삭제, 월간 달력, 주간/월간 통계 기능은 모두 정상 동작합니다.
 
-1. `firstProject/Config/Secrets.example.xcconfig` 파일을 같은 폴더(`firstProject/Config/`)에 복사해 이름을 `Secrets.xcconfig`로 변경합니다.
-2. `Secrets.xcconfig` 파일에 본인의 OpenAI API 키를 입력합니다. (값에 따옴표를 붙이지 마세요.)
-```text
-OPENAI_API_KEY = sk-본인의-실제-API-키
-```
-3. `Secrets.xcconfig`는 `.gitignore`에 등록되어 있어 Git 저장소에 업로드되지 않습니다.
+OpenAI API 키는 앱이 아니라 Firebase 서버(Secret Manager)에만 있으므로, 팀원이 키를 따로 설정할 필요가 없습니다.
+서버는 App Check로 진짜 Feelo 앱에서 온 요청인지 확인하고, 확인되지 않은 요청은 거절합니다.
+
+#### 시뮬레이터
+시뮬레이터는 App Check 디버그 토큰을 한 번 등록해야 AI 기능을 쓸 수 있습니다. 등록은 시뮬레이터마다 따로 합니다.
+
+1. 앱을 실행하고 Xcode 콘솔에서 `App Check debug token: '...'`을 찾아 복사합니다.
+2. Firebase 콘솔(`feelo-1e991` 프로젝트)의 **Security → App Check → Apps**에서 Feelo 앱의 **Manage debug tokens**에 등록합니다.
+   * Firebase 프로젝트 멤버만 등록할 수 있습니다. 멤버가 아니라면 프로젝트 관리자에게 **프로젝트 설정 → 사용자 및 권한**에서 추가해 달라고 요청하거나, 토큰을 개인 메시지로 보내 대신 등록해 달라고 요청합니다.
+3. 디버그 토큰은 App Check를 통과하게 해 주는 비밀값이므로 커밋하거나 공개 채널에 올리지 않습니다.
+
+#### 실제 기기 (iPhone)
+실제 기기는 디버그 토큰 대신 Apple의 App Attest로 확인하므로 토큰 등록이 필요 없습니다.
+
+* Xcode **Signing & Capabilities**의 Team은 프로젝트에 설정된 팀(Team ID `K4Y3BP25BV`)을 그대로 사용합니다.
+* 개인 계정 팀으로 바꿔서 빌드하면 App Attest 확인을 통과하지 못해 AI 기능이 실패할 수 있습니다.
+
+#### 번들 ID 변경 안내
+앱 번들 ID가 `com.jang.firstProject`에서 `com.jang.Feelo`로 바뀌었습니다.
+새 버전은 예전 앱과 다른 앱으로 설치되므로, 예전 앱에서 작성한 회고는 새 앱에 보이지 않습니다. 예전 앱을 지우지 않는 한 그 기록은 예전 앱에 그대로 남아 있습니다.
 
 ### 4. 프로젝트 실행
 1. Xcode에서 `firstProject/firstProject.xcodeproj` 파일을 엽니다.
@@ -199,14 +213,19 @@ OPENAI_API_KEY = sk-본인의-실제-API-키
 ```text
 EstTeam5/
 ├── README.md
+├── server/                           # Firebase Cloud Functions (OpenAI 호출 서버)
+│   └── functions/
+│       ├── index.js                  # 앱이 부르는 함수 2개 (recommendEmotion, analyzeWeek)
+│       ├── openAI.js                 # OpenAI 호출 및 오류 처리
+│       └── prompts.js                # 프롬프트 및 응답 형식
 └── firstProject/
     ├── Config/
-    │   ├── AdditionalInfo.plist          # 앱 표시 이름(Feelo) 및 OPENAI_API_KEY Info.plist 매핑
-    │   ├── Base.xcconfig                 # 공통 빌드 설정 (Secrets.xcconfig 선택적 include)
-    │   └── Secrets.example.xcconfig      # OpenAI API 키 설정 템플릿
+    │   ├── AdditionalInfo.plist          # 앱 표시 이름(Feelo)
+    │   └── firstProject.entitlements     # App Attest 권한
     ├── firstProject.xcodeproj/
     └── firstProject/
         ├── App/
+        │   ├── AppDelegate.swift         # Firebase 및 App Check 시작 설정
         │   ├── firstProjectApp.swift     # 앱 진입점, SwiftData 컨테이너, @AppStorage(온보딩·테마)
         │   └── MainTabView.swift         # 하단 2탭 구성 (달력 / 기록)
         ├── Models/
@@ -227,8 +246,7 @@ EstTeam5/
         │       ├── WeeklyReflectionAnalysis.swift# 6가지 사고 모델 AI 분석 결과 모델
         │       └── WeeklyAnalysisStore.swift     # @Observable 기반 AI 주간 분석 상태 관리
         ├── Services/
-        │   ├── AppConfig.swift                   # Info.plist 기반 API 키 및 모델 설정 조회
-        │   ├── OpenAIClient.swift                # OpenAI Chat Completions 제네릭 클라이언트 및 오류 처리
+        │   ├── AIServerClient.swift              # Firebase 서버 함수 호출 클라이언트 및 오류 처리
         │   ├── EmotionRecommender.swift          # 회고 본문 기반 AI 감정 추천 서비스
         │   └── WeeklyReflectionAnalyzer.swift    # 6가지 사고 모델 AI 주간 회고 분석 서비스
         ├── Views/
@@ -260,7 +278,7 @@ EstTeam5/
 | 타입 | 위치 | 주요 메서드 / 역할 |
 | :--- | :--- | :--- |
 | `Retrospective` | `Models/Retrospective/Retrospective.swift`<br>`Retrospective+Calendar.swift`<br>`Retrospective+Statistics.swift` | SwiftData 영구 저장 모델. 확장 파일에서 `latest(in:on:)`, `topEmotion(in:)`, `inPeriod(_:_:of:)`, `emotionCounts(in:)` 정적 집계 메서드 제공 |
-| `OpenAIClient` | `Services/OpenAIClient.swift` | `send(system:user:schemaName:schema:timeout:) async throws -> Output` — Structured Outputs(`json_schema`) 디코딩 및 `OpenAIError` 매핑 |
+| `AIServerClient` | `Services/AIServerClient.swift` | `send(functionName:content:timeout:) async throws -> Output` — Firebase 서버 함수 호출, 응답 디코딩 및 `AIServerError` 매핑 |
 | `EmotionRecommender` | `Services/EmotionRecommender.swift` | `recommend(for content: String) async throws -> EmotionRecommendation` — 회고 텍스트 분석 후 감정 및 추천 이유 반환 |
 | `WeeklyReflectionAnalyzer` | `Services/WeeklyReflectionAnalyzer.swift` | `analyze(_ input: WeeklyReflectionInput) async throws -> WeeklyReflectionAnalysis` — 주간 회고를 6가지 사고 모델로 분석 |
 | `WeeklyAnalysisStore` | `Models/Statistics/WeeklyAnalysisStore.swift` | `analyze(_:)`, `reset()` — 주간 AI 분석 비동기 상태(`idle`, `loading`, `loaded`, `failed`) 관리 |

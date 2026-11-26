@@ -4,7 +4,5 @@
 <dict>
 	<key>CFBundleDisplayName</key>
 	<string>Feelo</string>
-	<key>OPENAI_API_KEY</key>
-	<string>$(OPENAI_API_KEY)</string>
 </dict>
 </plist>

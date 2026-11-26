@@ -3,7 +3,7 @@ import Foundation
 /// 주간 회고 분석 결과입니다.
 ///
 /// 일어난 일, 감정 흐름, 좋았던 점, 아쉬운 점, 해결책, 요약의 여섯 항목으로 구성됩니다.
-struct WeeklyReflectionAnalysis: Equatable, Sendable, Decodable {
+nonisolated struct WeeklyReflectionAnalysis: Equatable, Sendable, Decodable {
     /// 일어난 일입니다.
     let facts: String
     /// 감정의 흐름입니다.
@@ -18,7 +18,7 @@ struct WeeklyReflectionAnalysis: Equatable, Sendable, Decodable {
     let summary: String
 
     /// 화면에 순서대로 보여줄 분석 항목 하나입니다.
-    struct ThinkingStep: Identifiable, Equatable, Sendable {
+    nonisolated struct ThinkingStep: Identifiable, Equatable, Sendable {
         /// 항목의 식별자입니다.
         let id: String
         /// 항목의 제목입니다.

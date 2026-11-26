@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// 회고에서 선택할 수 있는 감정 종류입니다.
-enum Emotion: String, CaseIterable, Identifiable, Decodable {
+nonisolated enum Emotion: String, CaseIterable, Identifiable, Decodable {
     /// 기쁨입니다.
     case joy
     /// 성취입니다.

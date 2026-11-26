@@ -44,7 +44,7 @@ final class WeeklyAnalysisStore {
     /// 주간 회고 분석을 시작합니다.
     ///
     /// 이미 `.loading` 상태이면 아무 동작도 하지 않습니다. 그렇지 않으면 상태를 `.loading`으로 바꾸고 비동기로 분석합니다.
-    /// 성공하면 `.loaded`, `OpenAIError`가 발생하면 해당 오류의 사용자 메시지와 함께 `.failed`가 됩니다.
+    /// 성공하면 `.loaded`, `AIServerError`가 발생하면 해당 오류의 사용자 메시지와 함께 `.failed`가 됩니다.
     /// 그 밖의 오류는 응답 오류(`invalidResponse`) 메시지로 `.failed`가 되며, 작업이 취소된 경우에는 상태를 바꾸지 않습니다.
     ///
     /// - Parameter input: 분석할 주간 회고 입력입니다.
@@ -58,12 +58,12 @@ final class WeeklyAnalysisStore {
                 state = .loaded(result)
             } catch is CancellationError {
                 return
-            } catch let error as OpenAIError {
+            } catch let error as AIServerError {
                 guard !Task.isCancelled else { return }
                 state = .failed(error.userMessage(for: WeeklyReflectionAnalyzer.feature))
             } catch {
                 guard !Task.isCancelled else { return }
-                state = .failed(OpenAIError.invalidResponse.userMessage(for: WeeklyReflectionAnalyzer.feature))
+                state = .failed(AIServerError.invalidResponse.userMessage(for: WeeklyReflectionAnalyzer.feature))
             }
         }
     }
