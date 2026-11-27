@@ -17,6 +17,8 @@ struct RetrospectiveListView: View {
     @State private var writeRequest: WriteRequest?
     /// 사용자가 선택한 앱 테마이며 `appTheme` 키로 저장됩니다.
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
+    /// AI 기능 사용(회고 내용 외부 전송) 동의 여부입니다.
+    @AppStorage("hasAgreedToAIDataSharing") private var hasAgreedToAIDataSharing = false
     /// 현재 Dynamic Type 글자 크기 설정입니다.
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -72,6 +74,19 @@ struct RetrospectiveListView: View {
                         Picker("테마", selection: $appTheme) {
                             ForEach(AppTheme.allCases) { theme in
                                 Text(theme.title).tag(theme)
+                            }
+                        }
+                        Divider()
+                        if let url = AppLink.privacyPolicy {
+                            Link(destination: url) {
+                                Label("개인정보처리방침", systemImage: "hand.raised")
+                            }
+                        }
+                        if hasAgreedToAIDataSharing {
+                            Button(role: .destructive) {
+                                hasAgreedToAIDataSharing = false
+                            } label: {
+                                Label("AI 기능 동의 철회", systemImage: "hand.raised.slash")
                             }
                         }
                     } label: {

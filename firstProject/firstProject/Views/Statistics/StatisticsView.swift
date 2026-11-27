@@ -15,6 +15,10 @@ struct StatisticsView: View {
     @State private var anchorDate = Date.now
     /// 주간 AI 분석의 상태와 실행을 관리하는 저장소입니다.
     @State private var weeklyAnalysis = WeeklyAnalysisStore()
+    /// AI 기능 사용 동의 화면 표시 여부입니다.
+    @State private var isShowingAIConsent = false
+    /// AI 기능 사용(회고 내용 외부 전송) 동의 여부입니다.
+    @AppStorage("hasAgreedToAIDataSharing") private var hasAgreedToAIDataSharing = false
 
     /// 현재 Dynamic Type 크기입니다.
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -54,6 +58,16 @@ struct StatisticsView: View {
         .tint(Color.tintPrimary)
         .onChange(of: anchorDate) { weeklyAnalysis.reset() }
         .onChange(of: period) { weeklyAnalysis.reset() }
+        .sheet(isPresented: $isShowingAIConsent) {
+            AIConsentView(onAgree: {
+                startWeeklyAnalysis()
+            })
+        }
+    }
+
+    /// 이번 주 회고로 AI 주간 분석을 시작합니다.
+    private func startWeeklyAnalysis() {
+        weeklyAnalysis.analyze(WeeklyReflectionInput(retrospectives: retrospectives, weekOf: anchorDate))
     }
 
     /// 가장 많은 감정의 색 번짐 효과를 얹은 화면 배경입니다.
@@ -81,7 +95,11 @@ struct StatisticsView: View {
 
             if period == .week {
                 WeeklyAIReportSection(state: weeklyAnalysis.state, accentEmotion: top) {
-                    weeklyAnalysis.analyze(WeeklyReflectionInput(retrospectives: retrospectives, weekOf: anchorDate))
+                    if hasAgreedToAIDataSharing {
+                        startWeeklyAnalysis()
+                    } else {
+                        isShowingAIConsent = true
+                    }
                 }
             }
         } else {

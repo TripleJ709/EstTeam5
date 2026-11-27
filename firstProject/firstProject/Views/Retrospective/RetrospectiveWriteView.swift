@@ -29,6 +29,10 @@ struct RetrospectiveWriteView: View {
     @State private var recommendation: RecommendationState = .idle
     /// 진행 중인 AI 감정 추천 작업이며 화면이 사라질 때 취소됩니다.
     @State private var recommendTask: Task<Void, Never>?
+    /// AI 기능 사용 동의 화면 표시 여부입니다.
+    @State private var isShowingAIConsent = false
+    /// AI 기능 사용(회고 내용 외부 전송) 동의 여부입니다.
+    @AppStorage("hasAgreedToAIDataSharing") private var hasAgreedToAIDataSharing = false
 
     /// AI 감정 추천을 요청하는 객체입니다.
     private let recommender = EmotionRecommender()
@@ -238,7 +242,11 @@ struct RetrospectiveWriteView: View {
     private var recommendSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button {
-                recommend()
+                if hasAgreedToAIDataSharing {
+                    recommend()
+                } else {
+                    isShowingAIConsent = true
+                }
             } label: {
                 HStack(spacing: 8) {
                     if recommendation == .loading {
@@ -264,6 +272,11 @@ struct RetrospectiveWriteView: View {
         .padding(.top, 8)
         .animation(.easeInOut(duration: 0.2), value: recommendation)
         .animation(.easeInOut(duration: 0.2), value: draft.emotion)
+        .sheet(isPresented: $isShowingAIConsent) {
+            AIConsentView(onAgree: {
+                recommend()
+            })
+        }
     }
 
     /// AI 추천 결과 또는 실패 메시지를 보여주는 영역입니다. 추천 결과는 선택된 감정이 추천 감정과 같을 때만 표시합니다.
