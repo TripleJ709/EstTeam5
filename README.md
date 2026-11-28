@@ -193,12 +193,14 @@ OpenAI API 키는 앱이 아니라 Firebase 서버(Secret Manager)에만 있으�
 2. Firebase 콘솔(`feelo-1e991` 프로젝트)의 **Security → App Check → Apps**에서 Feelo 앱의 **Manage debug tokens**에 등록합니다.
    * Firebase 프로젝트 멤버만 등록할 수 있습니다. 멤버가 아니라면 프로젝트 관리자에게 **프로젝트 설정 → 사용자 및 권한**에서 추가해 달라고 요청하거나, 토큰을 개인 메시지로 보내 대신 등록해 달라고 요청합니다.
 3. 디버그 토큰은 App Check를 통과하게 해 주는 비밀값이므로 커밋하거나 공개 채널에 올리지 않습니다.
+4. 앱을 지웠다가 다시 설치하면 토큰이 새로 만들어지므로 다시 등록해야 합니다.
 
 #### 실제 기기 (iPhone)
-실제 기기는 디버그 토큰 대신 Apple의 App Attest로 확인하므로 토큰 등록이 필요 없습니다.
+실제 기기는 디버그 토큰 대신 Apple의 App Attest로 확인하므로 토큰 등록이 필요 없습니다. 단, 프로젝트에 설정된 팀(Team ID `K4Y3BP25BV`)으로 서명한 앱만 통과합니다.
 
-* Xcode **Signing & Capabilities**의 Team은 프로젝트에 설정된 팀(Team ID `K4Y3BP25BV`)을 그대로 사용합니다.
-* 개인 계정 팀으로 바꿔서 빌드하면 App Attest 확인을 통과하지 못해 AI 기능이 실패할 수 있습니다.
+* 팀원은 실제 기기에서 확인할 때 **TestFlight**로 설치합니다. App Store Connect 내부 테스터로 초대받으면 TestFlight 앱에서 받을 수 있습니다.
+* Xcode에서 자기 개인 팀으로 바꿔 아이폰에 설치하면 앱은 실행되지만, AI 기능은 App Attest 확인을 통과하지 못해 실패합니다.
+* 팀이나 번들 ID를 바꾸면 `project.xcproj`가 바뀝니다. 이 변경은 커밋하지 않습니다. 실수로 바꿨다면 `git restore firstProject/firstProject.xcodeproj/project.xcproj`로 되돌립니다.
 
 #### 번들 ID 변경 안내
 앱 번들 ID가 `com.jang.firstProject`에서 `com.jang.Feelo`로 바뀌었습니다.
