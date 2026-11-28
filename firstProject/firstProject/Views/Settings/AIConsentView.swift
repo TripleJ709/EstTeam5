@@ -3,7 +3,7 @@ import SwiftUI
 /// AI 기능을 처음 쓸 때 회고 내용이 어디로 전송되는지 알리고 동의를 받는 화면입니다.
 ///
 /// 동의하면 `hasAgreedToAIDataSharing` 키에 저장하고 `onAgree`를 실행합니다.
-/// 동의는 회고 탭 왼쪽 위 메뉴에서 철회할 수 있습니다.
+/// 동의는 달력 탭 왼쪽 위 메뉴에서 철회할 수 있습니다.
 struct AIConsentView: View {
     /// 사용자가 동의했을 때 실행할 동작입니다. 예: AI 감정 추천 시작
     let onAgree: () -> Void
@@ -29,7 +29,7 @@ struct AIConsentView: View {
                     infoRow(title: "사용 목적", text: "감정 추천과 주간 분석 결과를 만드는 데만 사용해요.")
                     infoRow(title: "보관 기간", text: "Feelo 서버에는 저장하지 않아요. OpenAI는 전송된 내용을 AI 학습에 쓰지 않고, 남용 감시를 위해 최대 30일 보관한 뒤 삭제해요.")
                     infoRow(title: "이용 연령", text: "AI 기능은 만 14세 이상만 사용할 수 있어요.")
-                    infoRow(title: "동의하지 않으면", text: "AI 기능만 사용할 수 없어요. 회고 작성, 달력, 통계는 그대로 사용할 수 있어요.\n동의는 회고 탭 왼쪽 위 메뉴에서 언제든 철회할 수 있어요.")
+                    infoRow(title: "동의하지 않으면", text: "AI 기능만 사용할 수 없어요. 회고 작성, 달력, 통계는 그대로 사용할 수 있어요.\n동의는 달력 탭 왼쪽 위 메뉴에서 언제든 철회할 수 있어요.")
 
                     if let url = AppLink.privacyPolicy {
                         Link("개인정보처리방침 자세히 보기", destination: url)
