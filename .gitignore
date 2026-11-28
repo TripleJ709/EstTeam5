@@ -41,3 +41,8 @@ Secrets.xcconfig
 
 # 로컬 도구 작업 폴더
 .kiro/
+.claude/worktrees/
+.claude/settings.local.json
+
+# Firebase CLI 로그
+firebase-debug.log*

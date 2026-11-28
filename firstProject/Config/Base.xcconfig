@@ -1,7 +1,0 @@
-// 모든 빌드 설정에 공통으로 적용되는 xcconfig 파일입니다. (git에 올라갑니다)
-//
-// OPENAI_API_KEY의 기본값은 빈 값입니다.
-// 각자 만든 Secrets.xcconfig가 있으면 아래 줄에서 불러와 이 값을 덮어씁니다.
-// (#include? 는 파일이 없어도 오류 없이 넘어갑니다.)
-OPENAI_API_KEY =
-#include? "Secrets.xcconfig"

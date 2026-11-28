@@ -20,10 +20,12 @@ struct RetrospectiveDetailView: View {
     /// 화면 구성
     var body: some View {
         ZStack(alignment: .top) {
-            Color.bgApp.ignoresSafeArea()
-
-            EmotionWash(emotion: retrospective.emotion)
-                .offset(y: -90)
+            // 420pt 크기의 색 번짐을 overlay로 얹어야 화면보다 넓어지지 않아요.
+            Color.bgApp
+                .overlay(alignment: .top) {
+                    EmotionWash(emotion: retrospective.emotion)
+                        .offset(y: -90)
+                }
                 .ignoresSafeArea()
 
             ScrollView {
